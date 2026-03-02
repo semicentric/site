@@ -1,0 +1,40 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+#unicorn-container {
+  width: 100vw;
+  height: 100vh;
+}
+
+
+.contact-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 18px;
+  background: none;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  border: none;
+  transition: color 0.2s;
+  z-index: 10;
+}
+
+.contact-btn:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
