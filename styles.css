@@ -4,26 +4,39 @@
   box-sizing: border-box;
 }
 
-html,
+html {
+  background: #000;
+  height: 100%;
+}
+
 body {
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  min-height: calc(100% + 1px);
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
   background: #000;
 }
 
 #unicorn-container {
-  width: 100vw;
-  height: 100vh;
+  position: fixed;
+  inset: -50px;
+  width: calc(100vw + 100px);
+  height: calc(100vh + 100px);
 }
 
 
-.contact-btn {
+.bottom-links {
   position: fixed;
-  bottom: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
-  padding: 6px 18px;
+  display: flex;
+  gap: 20px;
+  z-index: 10;
+}
+
+.bottom-link {
+  padding: 6px 0;
   background: none;
   color: rgba(255, 255, 255, 0.5);
   text-decoration: none;
@@ -32,9 +45,8 @@ body {
   letter-spacing: 0.05em;
   border: none;
   transition: color 0.2s;
-  z-index: 10;
 }
 
-.contact-btn:hover {
+.bottom-link:hover {
   color: rgba(255, 255, 255, 0.85);
 }

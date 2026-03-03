@@ -2,11 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000">
     <title>Semicentric</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="apple-touch-icon" href="favicon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <meta property="og:title" content="Semicentric" />
     <meta property="og:description" content="plyght@semicentric.co" />
@@ -19,7 +22,11 @@
   </head>
   <body>
     <div data-us-project="hJrULgFwHeuavZfcgp0u" data-us-production="true" id="unicorn-container"></div>
-    <a href="mailto:plyght@semicentric.co" class="contact-btn">Contact</a>
+    <div class="bottom-links">
+      <a href="#" id="contact-link" class="bottom-link">Contact</a>
+      <a href="https://github.com/semicentric" target="_blank" rel="noopener" class="bottom-link">GitHub</a>
+      <a href="https://x.com/semicentric" target="_blank" rel="noopener" class="bottom-link">X</a>
+    </div>
     <script src="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.0-1/dist/unicornStudio.umd.js"></script>
     <script src="main.js"></script>
   </body>
