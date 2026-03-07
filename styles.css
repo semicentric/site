@@ -11,9 +11,8 @@ html {
 
 body {
   width: 100%;
-  min-height: calc(100% + 1px);
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
+  min-height: 100%;
+  overflow: hidden;
   background: #000;
 }
 
@@ -22,6 +21,89 @@ body {
   inset: -50px;
   width: calc(100vw + 100px);
   height: calc(100vh + 100px);
+}
+
+.logo-mark {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(calc(-50% - 60px), -50%);
+  width: 480px;
+  height: auto;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.logo-text {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Spline Sans Mono', monospace;
+  font-size: 80px;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+  line-height: 1;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.logo-text--semi {
+  right: calc(50% + 340px);
+}
+
+.logo-text--centric {
+  left: calc(50% + 200px);
+}
+
+@media (max-width: 1200px) {
+  .logo-mark {
+    width: clamp(320px, 35vw, 480px);
+    transform: translate(calc(-50% - 40px), -50%);
+  }
+
+  .logo-text {
+    font-size: clamp(48px, 6vw, 80px);
+  }
+
+  .logo-text--semi {
+    right: calc(50% + clamp(200px, 22vw, 340px));
+  }
+
+  .logo-text--centric {
+    left: calc(50% + clamp(140px, 14vw, 200px));
+  }
+}
+
+@media (max-width: 900px) {
+  .logo-mark {
+    width: clamp(220px, 60vw, 340px);
+    transform: translate(-50%, -50%);
+  }
+
+  .logo-text {
+    font-size: clamp(40px, 13vw, 64px);
+    transform: none;
+    top: auto;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .logo-text--semi {
+    right: auto;
+    bottom: auto;
+    top: 18%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .logo-text--centric {
+    left: auto;
+    top: auto;
+    bottom: 18%;
+    transform: translateX(-50%);
+  
 }
 
 

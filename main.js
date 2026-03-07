@@ -12,9 +12,6 @@ UnicornStudio.addScene({
   production: true,
 });
 
-setTimeout(function () {
-  window.scrollTo(0, 1);
-}, 100);
 
 document.getElementById("contact-link").addEventListener("click", function (e) {
   e.preventDefault();
