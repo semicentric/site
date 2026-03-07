@@ -10,6 +10,10 @@ UnicornStudio.addScene({
   fps: 60,
   lazyLoad: true,
   production: true,
+}).then(function () {
+  document.body.classList.add("us-ready");
+}).catch(function () {
+  document.body.classList.add("us-ready");
 });
 
 

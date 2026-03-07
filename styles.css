@@ -23,6 +23,19 @@ body {
   height: calc(100vh + 100px);
 }
 
+.logo-mark,
+.logo-text,
+.bottom-links {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.us-ready .logo-mark,
+.us-ready .logo-text,
+.us-ready .bottom-links {
+  opacity: 1;
+}
+
 .logo-mark {
   position: fixed;
   top: 50%;
@@ -106,6 +119,7 @@ body {
   
 }
 
+}
 
 .bottom-links {
   position: fixed;
