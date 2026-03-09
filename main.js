@@ -1,5 +1,5 @@
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/sw.js?v=2");
+  navigator.serviceWorker.register("/sw.js?v=3");
 }
 
 UnicornStudio.addScene({

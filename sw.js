@@ -1,9 +1,9 @@
-const CACHE_NAME = "semicentric-v2";
+const CACHE_NAME = "semicentric-v3";
 const URLS_TO_CACHE = [
   "/",
   "/index.html",
-  "/styles.css?v=2",
-  "/main.js?v=2",
+  "/styles.css?v=3",
+  "/main.js?v=3",
   "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.0-1/dist/unicornStudio.umd.js",
   "https://fonts.googleapis.com/css2?family=Spline+Sans+Mono:wght@500&display=swap",
   "/logo.svg",
