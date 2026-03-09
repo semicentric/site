@@ -112,13 +112,11 @@ body {
   }
 
   .logo-text--centric {
-    left: auto;
+    left: 50%;
     top: auto;
     bottom: 18%;
     transform: translateX(-50%);
-  
-}
-
+  }
 }
 
 .bottom-links {
