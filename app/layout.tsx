@@ -10,7 +10,6 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "semicentric",
   description: "semicentric",
-  icons: { icon: "/favicon.png" },
   openGraph: {
     images: ["/og-image.png"],
   },
