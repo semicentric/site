@@ -66,7 +66,7 @@ export default function Hero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.35, delay: CONTENT_DELAY, ease: "easeOut" }}
-              className="text-base md:text-lg font-medium tracking-tight text-white whitespace-nowrap"
+              className="text-lg md:text-xl font-medium tracking-tight text-white whitespace-nowrap"
             >
               semicentric
             </motion.span>
@@ -77,7 +77,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: CONTENT_DELAY + 0.1, ease: "easeOut" }}
-          className="text-neutral-500 text-xs md:text-sm leading-relaxed mb-6 max-w-xs"
+          className="text-neutral-500 text-sm md:text-base leading-relaxed mb-6 max-w-xs"
         >
           A couple sentences about semicentric go here. This is placeholder text
           that you can replace with the real description later.
