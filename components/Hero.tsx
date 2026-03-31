@@ -79,7 +79,7 @@ export default function Hero() {
           transition={{ duration: 0.3, delay: CONTENT_DELAY + 0.1, ease: "easeOut" }}
           className="text-neutral-500 text-sm md:text-base leading-relaxed mb-6 max-w-sm"
         >
-          the cybersecurity industry isn't obsolete. give us a minute. we're building the replacement.
+          the cybersecurity industry isn't obsolete. give us a minute, we're working on it.
         </motion.p>
 
         <motion.div
