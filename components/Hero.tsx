@@ -5,45 +5,12 @@ import { useEffect, useRef, useState } from "react";
 import Logo from "./Logo";
 import FooterLinks from "./FooterLinks";
 
-const SCRAMBLE_CHARS = "!@#$%^&*()_+-=[]{}|;:,.<>?/~`0123456789";
-const CONFIRM_TEXT = "you're in. we'll be in touch.";
-
-function useTextScramble(target: string, active: boolean) {
-  const [display, setDisplay] = useState("");
-  const frameRef = useRef<number>(0);
-
-  useEffect(() => {
-    if (!active) return;
-    let iteration = 0;
-    const total = target.length;
-    const step = () => {
-      setDisplay(
-        target
-          .split("")
-          .map((char, i) => {
-            if (i < iteration) return char;
-            if (char === " ") return " ";
-            return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
-          })
-          .join(""),
-      );
-      iteration += 0.6;
-      if (iteration < total + 1) {
-        frameRef.current = requestAnimationFrame(step);
-      }
-    };
-    frameRef.current = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frameRef.current);
-  }, [active, target]);
-
-  return display;
-}
-
 function WaitlistForm() {
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [focused, setFocused] = useState(false);
-  const scrambled = useTextScramble(CONFIRM_TEXT, state === "done");
+  const [formHeight, setFormHeight] = useState<number | undefined>(undefined);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +21,9 @@ function WaitlistForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, source: "semicentric" }),
       });
+      if (res.ok && formRef.current) {
+        setFormHeight(formRef.current.offsetHeight);
+      }
       setState(res.ok ? "done" : "error");
     } catch {
       setState("error");
@@ -62,18 +32,21 @@ function WaitlistForm() {
 
   if (state === "done") {
     return (
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="text-sm text-neutral-500 font-mono tracking-tight"
-      >
-        {scrambled}
-      </motion.p>
+      <div className="flex items-center" style={{ minHeight: formHeight }}>
+        <motion.p
+          initial={{ opacity: 0, filter: "blur(4px)" }}
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="text-sm text-neutral-500"
+        >
+          you're in.
+        </motion.p>
+      </div>
     );
   }
 
   return (
-    <form onSubmit={submit} className="max-w-sm">
+    <form onSubmit={submit} className="max-w-sm" ref={formRef}>
       <div
         className={`relative flex items-center border rounded-lg transition-colors duration-300 ${
           focused
@@ -113,6 +86,18 @@ function WaitlistForm() {
           )}
         </button>
       </div>
+      {process.env.NODE_ENV === "development" && state === "idle" && (
+        <button
+          type="button"
+          onClick={() => {
+            if (formRef.current) setFormHeight(formRef.current.offsetHeight);
+            setState("done");
+          }}
+          className="absolute -top-6 right-0 text-[10px] text-neutral-700 hover:text-white cursor-pointer"
+        >
+          test
+        </button>
+      )}
       {state === "error" && (
         <motion.p
           initial={{ opacity: 0, y: -4 }}
