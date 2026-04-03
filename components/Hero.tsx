@@ -160,7 +160,7 @@ export default function Hero() {
             <motion.div
               ref={targetRef}
               className="relative h-full shrink-0 overflow-visible"
-              style={{ aspectRatio: "604/440" }}
+              style={{ aspectRatio: "604/440", willChange: "transform", backfaceVisibility: "hidden" }}
               animate={containerControls}
             >
               {mounted && (
