@@ -56,6 +56,9 @@ function WaitlistForm() {
       >
         <input
           type="email"
+          inputMode="email"
+          autoComplete="email"
+          name="email"
           required
           value={email}
           onChange={(e) => {
