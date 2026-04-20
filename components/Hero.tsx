@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useAnimationControls } from "framer-motion";
+import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import Logo from "./Logo";
 import FooterLinks from "./FooterLinks";
@@ -48,7 +48,7 @@ function WaitlistForm() {
   return (
     <form onSubmit={submit} className="max-w-sm" ref={formRef}>
       <div
-        className={`relative flex items-center border rounded-lg transition-colors duration-300 ${
+        className={`relative flex items-center border rounded-xl [transition-property:border-color,background-color] duration-300 ease-out ${
           focused
             ? "border-neutral-600 bg-neutral-900/50"
             : "border-neutral-800 bg-transparent"
@@ -73,20 +73,35 @@ function WaitlistForm() {
         <button
           type="submit"
           disabled={state === "loading"}
-          className="shrink-0 mr-1.5 bg-white text-zinc-950 text-xs font-medium tracking-wide px-3.5 py-1.5 rounded-md hover:bg-neutral-200 active:scale-[0.97] transition-all disabled:opacity-40 cursor-pointer"
+          className="relative shrink-0 mr-1.5 bg-white text-zinc-950 text-xs font-medium tracking-wide px-3.5 py-1.5 rounded-md hover:bg-neutral-200 active:scale-[0.96] [transition-property:background-color,scale,opacity] duration-150 ease-out disabled:opacity-40 cursor-pointer overflow-hidden"
         >
-          {state === "loading" ? (
+          <span className="invisible" aria-hidden>
+            {state === "loading" ? "submitting" : state === "error" ? "try again" : "join waitlist"}
+          </span>
+          <AnimatePresence initial={false} mode="wait">
             <motion.span
-              animate={{ opacity: [1, 0.3, 1] }}
-              transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+              key={state}
+              initial={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+              animate={
+                state === "loading"
+                  ? { opacity: [1, 0.4, 1], scale: 1, filter: "blur(0px)" }
+                  : { opacity: 1, scale: 1, filter: "blur(0px)" }
+              }
+              exit={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+              transition={
+                state === "loading"
+                  ? {
+                      opacity: { duration: 1.2, repeat: Infinity, ease: "easeInOut" },
+                      scale: { type: "spring", duration: 0.3, bounce: 0 },
+                      filter: { type: "spring", duration: 0.3, bounce: 0 },
+                    }
+                  : { type: "spring", duration: 0.3, bounce: 0 }
+              }
+              className="absolute inset-0 flex items-center justify-center"
             >
-              submitting
+              {state === "loading" ? "submitting" : state === "error" ? "try again" : "join waitlist"}
             </motion.span>
-          ) : state === "error" ? (
-            "try again"
-          ) : (
-            "join waitlist"
-          )}
+          </AnimatePresence>
         </button>
       </div>
       {process.env.NODE_ENV === "development" && state === "idle" && (
@@ -186,7 +201,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: CONTENT_DELAY + 0.1, ease: "easeOut" }}
-          className="text-neutral-500 text-sm md:text-base leading-relaxed mb-6 max-w-sm"
+          className="text-neutral-500 text-sm md:text-base leading-relaxed mb-6 max-w-sm [text-wrap:pretty]"
         >
           the cybersecurity industry isn't obsolete. give us a minute, we're working on it.
         </motion.p>
