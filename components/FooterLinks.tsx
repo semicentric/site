@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
 const linkClass =
-  "relative text-neutral-500 hover:text-white [transition-property:color] duration-200 ease-out before:absolute before:inset-0 before:-my-3.5 before:-mx-2 before:content-['']";
+  "relative text-neutral-500 hover:text-neutral-900 [transition-property:color] duration-200 ease-out before:absolute before:inset-0 before:-my-3.5 before:-mx-2 before:content-['']";
 
 export default function FooterLinks() {
   const [copied, setCopied] = useState(false);
