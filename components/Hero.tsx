@@ -303,7 +303,7 @@ function HeroTitle() {
 export default function Hero() {
   return (
     <div className="w-full">
-      <div className="relative z-10 bg-[#fafafa]">
+      <div className="relative z-10 bg-[#fafafa] shadow-[0_20px_45px_-14px_rgba(0,0,0,0.4)]">
       <section className="px-6 md:px-12 pt-28 pb-28 md:pt-40 md:pb-36">
         <div className="mx-auto w-full max-w-3xl flex flex-col items-center text-center">
           <HeroTitle />
@@ -409,10 +409,10 @@ export default function Hero() {
       <footer className="fixed inset-x-0 bottom-0 z-0 h-[42vh] bg-neutral-950 text-neutral-400 flex flex-col overflow-hidden">
         <div
           aria-hidden
-          className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/50 to-transparent pointer-events-none"
+          className="absolute inset-x-0 top-0 h-px bg-white/[0.05] pointer-events-none"
         />
-        <div className="relative flex-1 flex items-center justify-center px-6">
-          <Logo className="w-[62%] max-w-xl h-auto text-[#1b1b1b]" />
+        <div className="relative flex-1 min-h-0 overflow-hidden flex items-center justify-center px-6">
+          <Logo className="w-[62%] max-w-xl h-auto text-[#161616] [filter:drop-shadow(0_-1px_0_rgba(0,0,0,0.6))_drop-shadow(0_1px_0_rgba(255,255,255,0.06))]" />
           <span
             className={`${serif} absolute inset-0 flex items-center justify-center translate-y-1 text-[clamp(1.75rem,8vw,5rem)] leading-none tracking-tight text-neutral-100`}
           >
@@ -420,7 +420,7 @@ export default function Hero() {
           </span>
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-5xl px-6 md:px-12 pb-8 space-y-4 text-xs">
+        <div className="relative z-10 mx-auto w-full max-w-5xl px-6 md:px-12 pb-[max(2.5rem,env(safe-area-inset-bottom))] space-y-4 text-xs">
           <div className="flex items-center justify-between tracking-wide text-neutral-400">
             <div className="flex items-center gap-6">
               <ContactLink className="hover:text-white [transition-property:color] duration-200" />
