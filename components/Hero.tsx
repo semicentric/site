@@ -233,6 +233,7 @@ const STATS = [
   { value: "any artifact", label: "what you ship and run" },
   { value: "adversary-grade", label: "the attacker's whole playbook" },
   { value: "audit-ready", label: "evidence that survives review" },
+  { value: "nothing leaves", label: "your data stays on your machine" },
 ];
 
 const serif = "font-[family-name:var(--font-record-disc)]";
@@ -361,6 +362,30 @@ export default function Hero() {
         </div>
       </section>
 
+      <section>
+        <div className="mx-auto max-w-5xl px-6 md:px-12 py-24 md:py-36">
+          <Reveal className="text-xs uppercase tracking-[0.2em] text-neutral-400">
+            what stays with you
+          </Reveal>
+          <Reveal
+            delay={0.05}
+            className={`${serif} mt-6 max-w-2xl text-3xl md:text-4xl leading-tight tracking-tight text-neutral-900 [text-wrap:balance]`}
+          >
+            the models our agents think with never see your data.
+          </Reveal>
+          <Reveal
+            delay={0.1}
+            className="mt-8 max-w-2xl text-base md:text-lg text-neutral-600 leading-relaxed [text-wrap:pretty]"
+          >
+            palisade sits between every agent and the cloud. the model works
+            entirely in placeholders &mdash; real names, records, and
+            credentials stay on your machine, filled back in only at trust
+            boundaries you control. we hold our own agents to the same standard
+            we hold your systems.
+          </Reveal>
+        </div>
+      </section>
+
       <section id="waitlist">
         <div className="mx-auto max-w-5xl px-6 md:px-12 py-24 md:py-40 flex flex-col items-center text-center">
           <Reveal className="text-xs uppercase tracking-[0.2em] text-neutral-400">
@@ -382,7 +407,7 @@ export default function Hero() {
 
           <Reveal
             delay={0.15}
-            className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-16 w-full max-w-2xl"
+            className="mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 sm:gap-12 w-full max-w-3xl"
           >
             {STATS.map((s) => (
               <div key={s.label} className="flex flex-col items-center gap-1.5">
