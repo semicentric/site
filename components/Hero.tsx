@@ -378,10 +378,10 @@ export default function Hero() {
             className="mt-8 max-w-2xl text-base md:text-lg text-neutral-600 leading-relaxed [text-wrap:pretty]"
           >
             palisade sits between every agent and the cloud. the model works
-            entirely in placeholders &mdash; real names, records, and
-            credentials stay on your machine, filled back in only at trust
-            boundaries you control. we hold our own agents to the same standard
-            we hold your systems.
+            entirely in placeholders: real names, records, and credentials stay
+            on your machine, filled back in only at trust boundaries you
+            control. we hold our own agents to the same standard we hold your
+            systems.
           </Reveal>
         </div>
       </section>
