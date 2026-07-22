@@ -5,7 +5,7 @@
       .mark { fill: #ffffff; }
     }
   </style>
-  <g transform="translate(48, 91) scale(0.75)">
+  <g transform="translate(0, 53.4) scale(0.9209)">
     <path class="mark" d="M0,260 L50.967,200 L556,200 L505.033,260 Z"/>
     <path class="mark" d="M506,0 L417.842,0 L171,440 L259.158,440 Z"/>
     <circle class="mark" cx="496" cy="135" r="35"/>
