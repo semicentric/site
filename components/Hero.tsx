@@ -326,7 +326,7 @@ export default function Hero() {
         className={`${serif} mx-auto max-w-4xl px-6 md:px-12 text-3xl md:text-5xl leading-[1.2] tracking-tight`}
       />
       <PinnedReveal
-        text="semicentric builds security agents that examine a system the way an attacker would. they assume nothing, verify everything, and surface what's really there. then it gets closed, before it becomes someone's way in. and the models they think with never see your data."
+        text="semicentric builds security agents that examine a system the way an attacker would. they assume nothing, verify everything, and surface what's really there. then it gets closed, before it becomes someone's way in. and they do it all without your data ever leaving your machine."
         className={`${serif} mx-auto max-w-4xl px-6 md:px-12 text-3xl md:text-5xl leading-[1.2] tracking-tight`}
       />
 
