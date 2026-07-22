@@ -326,7 +326,7 @@ export default function Hero() {
         className={`${serif} mx-auto max-w-4xl px-6 md:px-12 text-3xl md:text-5xl leading-[1.2] tracking-tight`}
       />
       <PinnedReveal
-        text="semicentric builds security agents that examine a system the way an attacker would. they assume nothing, verify everything, and surface what's really there. then it gets closed, before it becomes someone's way in."
+        text="semicentric builds security agents that examine a system the way an attacker would. they assume nothing, verify everything, and surface what's really there. then it gets closed, before it becomes someone's way in. and the models they think with never see your data."
         className={`${serif} mx-auto max-w-4xl px-6 md:px-12 text-3xl md:text-5xl leading-[1.2] tracking-tight`}
       />
 
@@ -359,30 +359,6 @@ export default function Hero() {
               </Reveal>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section>
-        <div className="mx-auto max-w-5xl px-6 md:px-12 py-24 md:py-36">
-          <Reveal className="text-xs uppercase tracking-[0.2em] text-neutral-400">
-            what stays with you
-          </Reveal>
-          <Reveal
-            delay={0.05}
-            className={`${serif} mt-6 max-w-2xl text-3xl md:text-4xl leading-tight tracking-tight text-neutral-900 [text-wrap:balance]`}
-          >
-            the models our agents think with never see your data.
-          </Reveal>
-          <Reveal
-            delay={0.1}
-            className="mt-8 max-w-2xl text-base md:text-lg text-neutral-600 leading-relaxed [text-wrap:pretty]"
-          >
-            palisade sits between every agent and the cloud. the model works
-            entirely in placeholders: real names, records, and credentials stay
-            on your machine, filled back in only at trust boundaries you
-            control. we hold our own agents to the same standard we hold your
-            systems.
-          </Reveal>
         </div>
       </section>
 
