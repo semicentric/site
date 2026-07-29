@@ -1,11 +1,15 @@
 import { motion } from "framer-motion";
 
+const EASE = [0.22, 1, 0.36, 1] as const;
+
 export default function Logo({
   className,
   animated = false,
+  delay = 0,
 }: {
   className?: string;
   animated?: boolean;
+  delay?: number;
 }) {
   if (!animated) {
     return (
@@ -34,38 +38,30 @@ export default function Logo({
       <g fill="currentColor">
         <motion.path
           d="m506 0h-88.158l-246.842 440h88.158z"
-          initial={{ opacity: 0, x: -30, scaleY: 0.7 }}
-          animate={{ opacity: 1, x: 0, scaleY: 1 }}
-          transition={{
-            duration: 0.6,
-            delay: 0.0,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          style={{ transformOrigin: "center center" }}
+          initial={{ opacity: 0, filter: "blur(6px)" }}
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          transition={{ duration: 0.6, delay, ease: EASE }}
         />
         <motion.path
           d="m0 260 50.967-60h505.033l-50.967 60z"
           initial={{ opacity: 0, scaleX: 0 }}
           animate={{ opacity: 1, scaleX: 1 }}
-          transition={{
-            duration: 0.5,
-            delay: 0.15,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          style={{ transformOrigin: "left center" }}
+          transition={{ duration: 0.55, delay: delay + 0.08, ease: EASE }}
+          style={{ transformBox: "fill-box", transformOrigin: "left center" }}
         />
         <motion.circle
           cx="496"
           cy="135"
           r="35"
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
           transition={{
-            duration: 0.4,
-            delay: 0.4,
-            ease: [0.34, 1.56, 0.64, 1],
+            type: "spring",
+            duration: 0.3,
+            bounce: 0,
+            delay: delay + 0.3,
           }}
-          style={{ transformOrigin: "496px 135px" }}
+          style={{ transformBox: "fill-box", transformOrigin: "center" }}
         />
       </g>
     </svg>

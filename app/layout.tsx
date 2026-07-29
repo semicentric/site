@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "semicentric",
   description:
-    "semicentric builds security agents that examine a system the way an attacker would, surface what's really there, and close it before it becomes someone's way in, without your data ever leaving your machine.",
+    "scanners read the code you wrote. attackers read the system you actually shipped. semicentric maps every container, binary, and dependency you run, proves what an attacker could reach, then closes it. nothing leaves your machine.",
   openGraph: {
     images: ["/og-image.png"],
   },
