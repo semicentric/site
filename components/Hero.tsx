@@ -74,12 +74,13 @@ function WaitlistForm() {
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           placeholder="you@email.com"
-          className="flex-1 bg-transparent px-3.5 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none min-w-0"
+          /* 16px on mobile, else iOS zooms the page in on focus */
+          className="flex-1 bg-transparent px-4 py-3 text-base md:text-sm text-neutral-900 placeholder:text-neutral-400 outline-none min-w-0"
         />
         <button
           type="submit"
           disabled={state === "loading"}
-          className="relative shrink-0 mr-1.5 bg-neutral-900 text-white text-xs font-medium tracking-wide px-3.5 py-1.5 rounded-md hover:bg-neutral-700 active:scale-[0.96] [transition-property:background-color,scale,opacity] duration-150 ease-out disabled:opacity-40 cursor-pointer overflow-hidden"
+          className="relative shrink-0 mr-1.5 bg-neutral-900 text-white text-xs font-medium tracking-wide px-4 py-2.5 md:py-1.5 rounded-md hover:bg-neutral-700 active:scale-[0.96] [transition-property:background-color,scale,opacity] duration-150 ease-out disabled:opacity-40 cursor-pointer overflow-hidden"
         >
           <span className="invisible" aria-hidden>
             {state === "loading" ? "submitting" : state === "error" ? "try again" : "join waitlist"}
@@ -177,8 +178,10 @@ function PinnedReveal({
   const words = text.split(" ");
   const FILL_END = 0.72;
   return (
-    <div ref={ref} className="relative h-[220vh]">
-      <div className="sticky top-0 h-dvh flex items-center">
+    // svh, not dvh: the pinned pane must not resize as mobile browser chrome
+    // collapses, or the text jumps mid-scroll. Shorter travel on phones too.
+    <div ref={ref} className="relative h-[165svh] md:h-[220vh]">
+      <div className="sticky top-0 h-svh flex items-center">
         <p className={className}>
           {words.map((w, i) => (
             <ScrollWord
@@ -217,15 +220,15 @@ function ContactLink({ className }: { className?: string }) {
 const CAPABILITIES = [
   {
     label: "uncover",
-    body: "the agents study what you actually ship and run, down to the artifact, even where the source is missing, stale, or owned by someone else. nothing hides just because no one looked.",
+    body: "what you actually ship and run, down to the artifact — even where the source is missing or stale.",
   },
   {
     label: "prove",
-    body: "every component and every reachable weakness, traced to the exact thing it lives in and confirmed against what's really deployed. the kind of evidence that survives an audit.",
+    body: "every reachable weakness traced to the thing it lives in, confirmed against what's really deployed.",
   },
   {
     label: "remediate",
-    body: "the fix gets written, applied, and checked against the real system before anyone trusts it. finding the problem and closing it stop being two separate jobs.",
+    body: "the fix written, applied, and verified against the real system before anyone trusts it.",
   },
 ];
 
@@ -237,6 +240,11 @@ const STATS = [
 ];
 
 const serif = "font-[family-name:var(--font-record-disc)]";
+
+// The ::before grows each footer link to a ~40px tap target without adding any
+// layout box — text-xs links are otherwise 16px tall and, for "x", 7px wide.
+const footLink =
+  "relative hover:text-white [transition-property:color] duration-200 before:absolute before:content-[''] before:-inset-x-3 before:-inset-y-3";
 
 const WORD = "semicentric".split("");
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -268,7 +276,7 @@ function HeroTitle() {
   return (
     <div className="flex w-full justify-center">
       <div
-        className={`${serif} relative inline-flex items-center text-[clamp(2.5rem,11vw,6.5rem)] leading-none tracking-tight text-neutral-900`}
+        className={`${serif} relative inline-flex items-center text-[clamp(2.25rem,10.5vw,6.5rem)] leading-none tracking-tight text-neutral-900`}
       >
         <span ref={wordRef} className="inline-flex">
           {WORD.map((ch, i) => (
@@ -303,9 +311,11 @@ function HeroTitle() {
 
 export default function Hero() {
   return (
-    <div className="w-full">
+    // --footer-h drives both the fixed footer and its spacer, so the scroll
+    // reveal can't drift. svh keeps it stable while mobile chrome collapses.
+    <div className="w-full [--footer-h:max(19rem,40svh)] md:[--footer-h:42vh]">
       <div className="relative z-10 bg-[#fafafa] shadow-[0_20px_45px_-14px_rgba(0,0,0,0.4)]">
-      <section className="px-6 md:px-12 pt-28 pb-28 md:pt-40 md:pb-36">
+      <section className="px-6 md:px-12 pt-24 pb-20 md:pt-40 md:pb-36">
         <div className="mx-auto w-full max-w-3xl flex flex-col items-center text-center">
           <HeroTitle />
 
@@ -313,7 +323,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: TITLE_DONE_S + 0.15, ease: "easeOut" }}
-            className="mt-10 max-w-md text-neutral-600 text-base md:text-lg leading-relaxed [text-wrap:pretty]"
+            className="mt-8 md:mt-10 max-w-md text-neutral-600 text-base md:text-lg leading-relaxed [text-wrap:pretty]"
           >
             security that understands your systems as well as the people
             trying to break them.
@@ -322,38 +332,43 @@ export default function Hero() {
       </section>
 
       <PinnedReveal
-        text="most security tools read what your code is meant to do. what matters is what your systems actually do once they're live. that gap is where almost every breach begins."
-        className={`${serif} mx-auto max-w-4xl px-6 md:px-12 text-3xl md:text-5xl leading-[1.2] tracking-tight`}
+        text="most security tools read what your code is meant to do. attackers only care what it actually does once it's live."
+        className={`${serif} mx-auto max-w-4xl px-6 md:px-12 text-3xl md:text-5xl leading-[1.15] md:leading-[1.2] tracking-tight`}
       />
       <PinnedReveal
-        text="semicentric builds security agents that examine a system the way an attacker would. they assume nothing, verify everything, and surface what's really there. then it gets closed, before it becomes someone's way in. and they do it all without your data ever leaving your machine."
-        className={`${serif} mx-auto max-w-4xl px-6 md:px-12 text-3xl md:text-5xl leading-[1.2] tracking-tight`}
+        text="semicentric closes that gap. agents that probe the running system the way an attacker would, without your data ever leaving your machine."
+        className={`${serif} mx-auto max-w-4xl px-6 md:px-12 text-3xl md:text-5xl leading-[1.15] md:leading-[1.2] tracking-tight`}
       />
 
       <section>
-        <div className="mx-auto max-w-5xl px-6 md:px-12 py-24 md:py-36">
+        <div className="mx-auto max-w-5xl px-6 md:px-12 py-20 md:py-36">
           <Reveal className="text-xs uppercase tracking-[0.2em] text-neutral-400">
             what we do
           </Reveal>
           <Reveal
             delay={0.05}
-            className={`${serif} mt-6 max-w-2xl text-3xl md:text-4xl leading-tight tracking-tight text-neutral-900 [text-wrap:balance]`}
+            className={`${serif} mt-5 md:mt-6 max-w-2xl text-[1.75rem] md:text-4xl leading-tight tracking-tight text-neutral-900 [text-wrap:balance]`}
           >
             the gaps an attacker would find, resolved before they do.
           </Reveal>
-          <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-200 md:grid-cols-3">
+          <div className="mt-10 md:mt-14 grid gap-px overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-200 md:grid-cols-3">
             {CAPABILITIES.map((c, i) => (
               <Reveal
                 key={c.label}
                 delay={i * 0.08}
-                className="flex flex-col gap-4 bg-[#fafafa] p-8 md:p-10"
+                className="flex flex-col gap-3 md:gap-4 bg-[#fafafa] p-6 md:p-10"
               >
-                <span
-                  className={`${serif} text-2xl tracking-tight text-neutral-900`}
-                >
-                  {c.label}
-                </span>
-                <p className="text-base text-neutral-600 leading-relaxed [text-wrap:pretty]">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-[11px] tabular-nums tracking-[0.15em] text-neutral-400">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span
+                    className={`${serif} text-2xl tracking-tight text-neutral-900`}
+                  >
+                    {c.label}
+                  </span>
+                </div>
+                <p className="text-[15px] md:text-base text-neutral-600 leading-relaxed [text-wrap:pretty]">
                   {c.body}
                 </p>
               </Reveal>
@@ -363,57 +378,61 @@ export default function Hero() {
       </section>
 
       <section id="waitlist">
-        <div className="mx-auto max-w-5xl px-6 md:px-12 py-24 md:py-40 flex flex-col items-center text-center">
+        <div className="mx-auto max-w-5xl px-6 md:px-12 py-20 md:py-40 flex flex-col items-center text-center">
           <Reveal className="text-xs uppercase tracking-[0.2em] text-neutral-400">
             the waitlist is open
           </Reveal>
           <Reveal
             delay={0.05}
-            className={`${serif} mt-6 text-4xl md:text-6xl leading-[1.05] tracking-tight text-neutral-900 [text-wrap:balance]`}
+            className={`${serif} mt-5 md:mt-6 text-4xl md:text-6xl leading-[1.05] tracking-tight text-neutral-900 [text-wrap:balance]`}
           >
             be first to deploy.
           </Reveal>
           <Reveal
             delay={0.1}
-            className="mt-6 max-w-md text-lg text-neutral-600 leading-relaxed [text-wrap:pretty]"
+            className="mt-4 md:mt-6 max-w-md text-base md:text-lg text-neutral-600 leading-relaxed [text-wrap:pretty]"
           >
-            we&rsquo;re onboarding early teams now. leave your email and
-            we&rsquo;ll reach out when it&rsquo;s your turn.
+            we&rsquo;re onboarding early teams. leave your email.
+          </Reveal>
+
+          <Reveal delay={0.15} className="mt-10 md:mt-14 flex justify-center w-full">
+            <WaitlistForm />
           </Reveal>
 
           <Reveal
-            delay={0.15}
-            className="mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 sm:gap-12 w-full max-w-3xl"
+            delay={0.2}
+            /* 4-up only from lg — between 768 and 1024 the cells are too narrow
+               for "adversary-grade" and every value breaks mid-word */
+            className="mt-14 md:mt-20 grid grid-cols-2 lg:grid-cols-4 gap-px w-full max-w-3xl lg:max-w-4xl overflow-hidden rounded-xl border border-neutral-200 bg-neutral-200"
           >
             {STATS.map((s) => (
-              <div key={s.label} className="flex flex-col items-center gap-1.5">
+              <div
+                key={s.label}
+                className="flex flex-col items-center justify-center gap-1.5 bg-[#fafafa] px-3 py-6 md:py-7"
+              >
                 <span
-                  className={`${serif} text-2xl md:text-3xl tracking-tight text-neutral-900`}
+                  className={`${serif} text-lg md:text-2xl lg:text-xl tracking-tight text-neutral-900 [text-wrap:balance]`}
                 >
                   {s.value}
                 </span>
-                <span className="text-[11px] uppercase tracking-[0.15em] text-neutral-400">
+                <span className="text-[10px] md:text-[11px] uppercase tracking-[0.12em] md:tracking-[0.15em] text-neutral-400 [text-wrap:balance]">
                   {s.label}
                 </span>
               </div>
             ))}
-          </Reveal>
-
-          <Reveal delay={0.2} className="mt-16 flex justify-center w-full">
-            <WaitlistForm />
           </Reveal>
         </div>
       </section>
 
       </div>
 
-      <footer className="fixed inset-x-0 bottom-0 z-0 h-[42vh] bg-neutral-950 text-neutral-400 flex flex-col overflow-hidden">
+      <footer className="fixed inset-x-0 bottom-0 z-0 h-[var(--footer-h)] bg-neutral-950 text-neutral-400 flex flex-col overflow-hidden">
         <div
           aria-hidden
           className="absolute inset-x-0 top-0 h-px bg-white/[0.05] pointer-events-none"
         />
         <div className="relative flex-1 min-h-0 overflow-hidden flex items-center justify-center px-6">
-          <Logo className="w-[62%] max-w-xl h-auto text-[#161616] [filter:drop-shadow(0_-1px_0_rgba(0,0,0,0.6))_drop-shadow(0_1px_0_rgba(255,255,255,0.06))]" />
+          <Logo className="w-[72%] sm:w-[62%] max-w-xl h-auto text-[#161616] [filter:drop-shadow(0_-1px_0_rgba(0,0,0,0.6))_drop-shadow(0_1px_0_rgba(255,255,255,0.06))]" />
           <span
             className={`${serif} absolute inset-0 flex items-center justify-center translate-y-1 text-[clamp(1.75rem,8vw,5rem)] leading-none tracking-tight text-neutral-100`}
           >
@@ -421,15 +440,15 @@ export default function Hero() {
           </span>
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-5xl px-6 md:px-12 pb-[max(2.5rem,env(safe-area-inset-bottom))] space-y-4 text-xs">
-          <div className="flex items-center justify-between tracking-wide text-neutral-400">
-            <div className="flex items-center gap-6">
-              <ContactLink className="hover:text-white [transition-property:color] duration-200" />
+        <div className="relative z-10 mx-auto w-full max-w-5xl px-6 md:px-12 pb-[max(2rem,calc(env(safe-area-inset-bottom)+1.25rem))] space-y-3 md:space-y-4 text-xs">
+          <div className="flex items-center justify-center gap-7 md:justify-between tracking-wide text-neutral-400">
+            <div className="flex items-center gap-7">
+              <ContactLink className={footLink} />
               <a
                 href="https://github.com/semicentric"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-white [transition-property:color] duration-200"
+                className={footLink}
               >
                 github
               </a>
@@ -438,18 +457,20 @@ export default function Hero() {
               href="https://x.com/semicentric"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white [transition-property:color] duration-200"
+              /* min-w + text-right widens the target leftward, so the glyph
+                 still sits flush right on desktop */
+              className={`${footLink} min-w-4 text-center md:text-right`}
             >
               x
             </a>
           </div>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-neutral-600">
+          <div className="flex flex-col items-center text-center gap-1 sm:flex-row sm:items-center sm:justify-between sm:text-left sm:gap-2 text-[11px] md:text-xs text-neutral-600">
             <p>© 2026 semicentric. all rights reserved.</p>
             <p>building in stealth.</p>
           </div>
         </div>
       </footer>
-      <div aria-hidden className="h-[42vh]" />
+      <div aria-hidden className="h-[var(--footer-h)]" />
     </div>
   );
 }

@@ -6,6 +6,12 @@
   --font-sans: var(--font-inter);
 }
 
+html {
+  /* stop iOS from auto-inflating text when the device rotates */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);
