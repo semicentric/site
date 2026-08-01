@@ -8,9 +8,8 @@ export const EASE = [0.22, 1, 0.36, 1] as const;
 export const EMAIL = "ops@semicentric.co";
 
 export const COPY = {
-  lead: "semicentric is a security company. we work on software that reads the systems people actually run.",
-  what: "not the source in your repo: the containers, binaries, and dependencies that ship with it.",
-  list: "leave an email if you want to know when we open it up.",
+  lead: "semicentric is a security company. the machine in front of you should answer to you.",
+  what: "your data stays on the hardware you own, from the firmware on the board to the model in the cloud.",
 };
 
 const WORD = "semicentric".split("");

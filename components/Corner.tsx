@@ -1,7 +1,7 @@
 "use client";
 
-import { COPY, In, Links, Wordmark } from "../shared";
-import Waitlist from "../Waitlist";
+import { COPY, In, Links, Wordmark } from "./shared";
+import Waitlist from "./Waitlist";
 
 export default function Corner() {
   return (

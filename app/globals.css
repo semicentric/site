@@ -14,33 +14,15 @@
 }
 
 :root {
-  --font-display: var(--font-record-disc);
+  --font-display: var(--font-instrument-sans);
+  --display-weight: 600;
 }
 
-[data-font="record"] {
-  --font-display: var(--font-record-disc);
-}
-[data-font="zodiak"] {
-  --font-display: var(--font-zodiak);
-}
-[data-font="basteleur"] {
-  --font-display: var(--font-basteleur);
-}
-[data-font="sligoil"] {
-  --font-display: var(--font-sligoil);
-}
-[data-font="bluu-next"] {
-  --font-display: var(--font-bluu-next);
-}
-[data-font="cabinet-grotesk"] {
-  --font-display: var(--font-cabinet-grotesk);
-}
-[data-font="departure-mono"] {
-  --font-display: var(--font-departure-mono);
-}
 
 .font-display {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: var(--display-weight, 400);
+  font-variation-settings: var(--display-variation, normal);
 }
 
 body {

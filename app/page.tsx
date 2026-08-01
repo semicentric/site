@@ -1,9 +1,9 @@
-import Site from "@/components/Site";
+import Corner from "@/components/Corner";
 
 export default function Home() {
   return (
     <main>
-      <Site />
+      <Corner />
     </main>
   );
 }

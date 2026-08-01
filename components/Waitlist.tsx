@@ -26,7 +26,7 @@ export default function Waitlist() {
   };
 
   return (
-    <div className="relative h-6 max-w-xs">
+    <div className="relative h-11">
       <AnimatePresence initial={false} mode="wait">
         {state === "done" ? (
           <motion.p
@@ -34,9 +34,9 @@ export default function Waitlist() {
             initial={{ opacity: 0, filter: "blur(4px)" }}
             animate={{ opacity: 1, filter: "blur(0px)" }}
             transition={{ duration: 0.4, ease: EASE }}
-            className="absolute inset-0 text-[15px] text-muted"
+            className="absolute inset-0 flex items-center text-[15px] text-muted"
           >
-            noted. we will write to you.
+            you are on the list.
           </motion.p>
         ) : (
           <motion.form
@@ -58,7 +58,7 @@ export default function Waitlist() {
                 if (state === "error") setState("idle");
               }}
               placeholder="your email"
-              className="min-w-0 flex-1 bg-transparent px-3 py-2 text-[15px] text-ink outline-none placeholder:text-faint"
+              className="h-full min-w-0 flex-1 bg-transparent px-3.5 text-[15px] text-ink outline-none placeholder:text-faint"
             />
             <button
               type="submit"
