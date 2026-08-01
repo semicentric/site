@@ -1,9 +1,46 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #fafafa;
-  --color-foreground: #0a0a0a;
+  --color-background: #f7f7f5;
+  --color-foreground: #101010;
+  --color-paper: #f7f7f5;
+  --color-ink: #101010;
+  --color-body: #3b3a36;
+  --color-muted: #75746e;
+  --color-faint: #a3a29b;
+  --color-rule: #e2e1db;
   --font-sans: var(--font-inter);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+:root {
+  --font-display: var(--font-record-disc);
+}
+
+[data-font="record"] {
+  --font-display: var(--font-record-disc);
+}
+[data-font="zodiak"] {
+  --font-display: var(--font-zodiak);
+}
+[data-font="basteleur"] {
+  --font-display: var(--font-basteleur);
+}
+[data-font="sligoil"] {
+  --font-display: var(--font-sligoil);
+}
+[data-font="bluu-next"] {
+  --font-display: var(--font-bluu-next);
+}
+[data-font="cabinet-grotesk"] {
+  --font-display: var(--font-cabinet-grotesk);
+}
+[data-font="departure-mono"] {
+  --font-display: var(--font-departure-mono);
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
 }
 
 body {
@@ -14,9 +51,28 @@ body {
   text-wrap: pretty;
 }
 
-h1,
-h2,
-h3,
-h4 {
-  text-wrap: balance;
+::selection {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 1px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+input:focus,
+input:focus-visible {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
