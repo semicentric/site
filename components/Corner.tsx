@@ -8,7 +8,7 @@ export default function Corner() {
     <div className="flex min-h-dvh flex-col justify-between px-6 py-10 sm:px-12 sm:py-14">
       <Wordmark className="text-[1.75rem] sm:text-[2rem]" />
 
-      <div className="max-w-[34rem] pb-8 sm:pb-4">
+      <div className="max-w-[34rem] sm:pb-4">
         <In
           as="p"
           className="font-display text-[1.5rem] leading-[1.4] tracking-[-0.014em] text-ink [text-wrap:pretty] sm:text-[1.75rem]"
