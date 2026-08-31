@@ -20,14 +20,16 @@ const svg = await satori(
   >
     <svg
       fill="none"
-      viewBox="-24 0 604 440"
+      viewBox="31 164 450 184"
       xmlns="http://www.w3.org/2000/svg"
-      width="80"
-      height="58"
+      width="126"
+      height="52"
     >
-      <path d="m0 260 50.967-60h505.033l-50.967 60z" fill="white" />
-      <path d="m506 0h-88.158l-246.842 440h88.158z" fill="white" />
-      <circle cx="496" cy="135" r="35" fill="white" />
+      <path d="M115 251.5 L126 248.5 L250 174.5 L137 194 L116 238Z" fill="white" />
+      <path d="M57 262.5 L87.5 266 L98.5 263.5 L64.5 244Z" fill="white" />
+      <path d="M125.5 265.5 L160 278 L471 256 L147 255.5Z" fill="white" />
+      <path d="M41 303.5 L65.5 326.5 L105.5 290 L105.5 276.5Z" fill="white" />
+      <path d="M203.5 336.5 L129.5 285.5 L129.5 294 L168.5 337.5Z" fill="white" />
     </svg>
     <div
       style={{

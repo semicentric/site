@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
-import Logo from "./Logo";
+import Logo, { LOGO_RATIO } from "./Logo";
 
 export const EASE = [0.22, 1, 0.36, 1] as const;
 export const EMAIL = "ops@semicentric.co";
@@ -80,7 +80,7 @@ export function Wordmark({
     <span
       aria-hidden
       className={`relative z-10 inline-flex shrink-0 overflow-visible ${markClassName ?? "ml-[0.16em]"}`}
-      style={{ height: "0.78em", aspectRatio: "604/440" }}
+      style={{ height: "0.78em", aspectRatio: LOGO_RATIO }}
     >
       <Logo className="h-full w-auto text-ink" animated delay={reduced ? 0 : LOGO_AT_S} />
     </span>
