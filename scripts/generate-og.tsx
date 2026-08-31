@@ -15,15 +15,15 @@ const svg = await satori(
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      gap: "20px",
+      gap: "36px",
     }}
   >
     <svg
       fill="none"
       viewBox="31 164 450 184"
       xmlns="http://www.w3.org/2000/svg"
-      width="126"
-      height="52"
+      width="254"
+      height="104"
     >
       <path d="M115 251.5 L126 248.5 L250 174.5 L137 194 L116 238Z" fill="white" />
       <path d="M57 262.5 L87.5 266 L98.5 263.5 L64.5 244Z" fill="white" />
@@ -34,7 +34,7 @@ const svg = await satori(
     <div
       style={{
         display: "flex",
-        fontSize: 48,
+        fontSize: 96,
         fontFamily: "Inter",
         fontWeight: 500,
         color: "white",
