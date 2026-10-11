@@ -143,6 +143,13 @@ const PALISADE = {
 const PICKET = "^  \n|==\n|  ";
 const PICKET_COUNT = 16;
 
+const EXCHANGE = [
+  ["jane@acme.com", "<EMAIL_1>"],
+  ["+1 415 555 0132", "<PHONE_1>"],
+  ["4111 1111 1111 1111", "<CARD_1>"],
+  ["sk-live-9f2c81e0", "<KEY_1>"],
+];
+
 function Highlight({ children }: { children: string }) {
   return (
     <span style={{ display: "flex" }}>
@@ -150,13 +157,34 @@ function Highlight({ children }: { children: string }) {
         style={{
           backgroundColor: PALISADE.ink,
           color: PALISADE.bg,
-          padding: "0 22px 10px 22px",
-          marginLeft: -22,
+          padding: "0 18px 8px 18px",
+          marginLeft: -18,
         }}
       >
         {children}
       </span>
     </span>
+  );
+}
+
+function Column({ values, align, color }: { values: string[]; align: "flex-start" | "flex-end"; color: string }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: align,
+        gap: 18,
+        width: 250,
+        fontFamily: "Fragment Mono",
+        fontSize: 20,
+        color,
+      }}
+    >
+      {values.map((v) => (
+        <span key={v}>{v}</span>
+      ))}
+    </div>
   );
 }
 
@@ -168,44 +196,37 @@ await render(
       height: "100%",
       display: "flex",
       flexDirection: "column",
+      justifyContent: "space-between",
       backgroundColor: PALISADE.bg,
       color: PALISADE.ink,
       overflow: "hidden",
     }}
   >
-    <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "104px 96px 0 96px" }}>
-      <svg width={52} height={52} viewBox="0 0 400 400">
-        <path fill={PALISADE.ink} fill-rule="evenodd" d={PALISADE.mark} />
-      </svg>
-      <span style={{ fontFamily: "Archivo", fontSize: 38, fontWeight: 700, letterSpacing: "-0.02em" }}>
-        Palisade
-      </span>
-    </div>
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        flexGrow: 1,
-        justifyContent: "center",
-        padding: "0 96px",
+        padding: "104px 96px 0 96px",
+        fontFamily: "Archivo",
+        fontSize: 64,
+        fontWeight: 700,
+        letterSpacing: "-0.02em",
+        lineHeight: 1.08,
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          fontFamily: "Archivo",
-          fontSize: 80,
-          fontWeight: 700,
-          letterSpacing: "-0.02em",
-          lineHeight: 1.06,
-        }}
-      >
-        <span>The line</span>
-        <span>your data</span>
-        <Highlight>never</Highlight>
-        <Highlight>crosses.</Highlight>
+      <span>The line your data</span>
+      <Highlight>never crosses.</Highlight>
+    </div>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 72px" }}>
+      <Column values={EXCHANGE.map(([real]) => real)} align="flex-end" color={PALISADE.picket} />
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+        <div style={{ width: 2, height: 64, backgroundColor: PALISADE.accent }} />
+        <svg width={58} height={58} viewBox="0 0 400 400">
+          <path fill={PALISADE.ink} fill-rule="evenodd" d={PALISADE.mark} />
+        </svg>
+        <div style={{ width: 2, height: 64, backgroundColor: PALISADE.accent }} />
       </div>
+      <Column values={EXCHANGE.map(([, placeholder]) => placeholder)} align="flex-start" color={PALISADE.ink} />
     </div>
     <div
       style={{
