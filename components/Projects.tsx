@@ -24,7 +24,7 @@ export default function Projects() {
   return (
     <section
       aria-label="projects"
-      className="grid w-full grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-4 md:grid-cols-4 lg:max-w-[calc((100dvh-16rem)*3.2+3rem)]"
+      className="grid w-full grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-4 md:max-w-[min(100cqw,calc((100cqh-2.25rem)*3.2+3rem))] md:grid-cols-4"
     >
       {PROJECTS.map((project, i) => (
         <ProjectCard

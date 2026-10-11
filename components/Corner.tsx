@@ -6,10 +6,14 @@ import Waitlist from "./Waitlist";
 
 export default function Corner() {
   return (
-    <div className="flex min-h-dvh flex-col gap-12 px-6 py-10 sm:px-12 sm:py-14">
-      <Wordmark className="text-[1.75rem] sm:text-[2rem]" />
+    <div className="flex min-h-dvh flex-col gap-12 px-6 py-10 sm:px-12 sm:py-14 md:h-dvh md:overflow-hidden">
+      {/* The face carries ~0.09em of empty ascent above its letters, so pull the
+          wordmark up by that much to match the footer's edge optically. */}
+      <Wordmark className="-mt-[0.09em] text-[1.75rem] sm:text-[2rem]" />
 
-      <div className="flex flex-1 items-center">
+      {/* On desktop the page is exactly one screen; the row is sized from this
+          box's height via container units, so nothing ever scrolls. */}
+      <div className="flex flex-1 items-center md:min-h-0 md:[container-type:size]">
         <Projects />
       </div>
 
