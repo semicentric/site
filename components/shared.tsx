@@ -168,7 +168,7 @@ export function Links({
 }) {
   return (
     <div
-      className={`flex gap-x-7 text-[15px] ${
+      className={`flex gap-x-5 text-[15px] sm:gap-x-7 ${
         vertical ? "flex-col items-start gap-y-2.5" : "flex-wrap items-center gap-y-2"
       } ${className ?? ""}`}
     >
