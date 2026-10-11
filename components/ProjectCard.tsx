@@ -20,7 +20,6 @@ export type Project = {
   name: string;
   href?: string;
   image?: string;
-  note?: string;
 };
 
 // The page paper under the tile's 2.5% black wash.
@@ -214,12 +213,11 @@ function useCardCanvas({
         const keep = tone - cell.scatter * 0.85;
         if (keep <= 0.2) continue;
         const arrive = smooth((intro * 1.3 - (xn * 0.55 + cell.scatter * 0.45)) / 0.3);
-        const order = (1 - yn) * 0.45 + cell.scatter * 0.55;
-        const gone = smooth((strength * 1.35 - order) / 0.35);
+        const gone = smooth((strength * 1.3 - (xn * 0.45 + cell.scatter * 0.55)) / 0.3);
         const alpha = Math.min(0.55, (keep - 0.2) * 1.1) * arrive * (1 - gone);
         const char =
           keep > 0.55 ? flickerGlyph(tone, cell.seed >>> 8, phase) : keep > 0.38 ? ":" : ".";
-        glyph(char, col * cw, row * ch - gone * ch * 3, alpha);
+        glyph(char, col * cw, row * ch, alpha);
       }
       ctx.globalAlpha = 1;
     };
@@ -351,19 +349,13 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
         />
         {field && (
           <span
-            className="absolute inset-0 flex flex-col items-center justify-center text-[13px] tracking-[0.01em] text-muted [transition-property:opacity,filter,translate] duration-500 ease-out"
+            className="absolute inset-0 flex items-center justify-center text-[13px] tracking-[0.01em] text-muted [transition-property:opacity,filter] duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
             style={{
               opacity: over ? 1 : 0,
-              filter: over ? "blur(0px)" : "blur(4px)",
-              translate: over ? "0 0" : "0 4px",
+              filter: over ? "blur(0px)" : "blur(6px)",
             }}
           >
             Coming soon
-            {project.note && (
-              <span className="mt-1 max-w-[85%] text-center text-[12px] leading-snug text-faint">
-                {project.note}
-              </span>
-            )}
           </span>
         )}
       </motion.div>
@@ -376,10 +368,10 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
         <span className={field ? "text-muted" : "text-ink"}>{project.name}</span>
         <span
           aria-hidden
-          className="text-muted [transition-property:opacity,translate] duration-300 ease-out"
+          className="text-muted [transition-property:opacity,filter] duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
           style={{
             opacity: over ? 1 : 0,
-            translate: over ? "0 0" : "-4px 4px",
+            filter: over ? "blur(0px)" : "blur(6px)",
           }}
         >
           {project.href ? "↗" : "Soon"}

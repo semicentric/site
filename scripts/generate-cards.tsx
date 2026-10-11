@@ -135,7 +135,6 @@ await render(
 const PALISADE = {
   bg: "#f6f5f1",
   ink: "#14130f",
-  muted: "#6f6d64",
   picket: "#cfcdc2",
   accent: "rgba(244, 60, 30, 0.55)",
   mark: "M 200,25 L 230,85 L 230,375 L 170,375 L 170,85 Z M 63.786797,293.786797 L 293.786797,63.786797 L 336.213203,106.213203 L 106.213203,336.213203 Z",
@@ -189,7 +188,6 @@ await render(
         flexGrow: 1,
         justifyContent: "center",
         padding: "0 96px",
-        gap: 32,
       }}
     >
       <div
@@ -208,9 +206,6 @@ await render(
         <Highlight>never</Highlight>
         <Highlight>crosses.</Highlight>
       </div>
-      <span style={{ fontFamily: "Fragment Mono", fontSize: 22, color: PALISADE.muted }}>
-        PII firewall for cloud LLM agents.
-      </span>
     </div>
     <div
       style={{

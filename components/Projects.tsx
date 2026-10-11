@@ -7,7 +7,7 @@ const PROJECTS: Project[] = [
   { name: "Neptune", href: "https://neptune.rip", image: "/projects/neptune.png" },
   { name: "Palisade", href: "https://palisade.rocks", image: "/projects/palisade.png" },
   { name: "Evanescent" },
-  { name: "SRAM", note: "Self-Reorganizing Autonomous Machines" },
+  { name: "SRAM" },
 ];
 
 export default function Projects() {
