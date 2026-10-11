@@ -35,12 +35,14 @@ const RETURN_MS = 620;
 function useCardCanvas({
   canvasRef,
   over,
+  label,
   src,
   mobileSrc,
   delay,
 }: {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   over: React.RefObject<boolean>;
+  label: React.RefObject<HTMLSpanElement | null>;
   src?: string;
   mobileSrc?: string;
   delay: number;
@@ -86,9 +88,13 @@ function useCardCanvas({
     let start: number | null = null;
     let landed = false;
     let resolve = 0;
-    let strength = 0;
     let roll = 0;
     let wasOver = false;
+    let morph = 0;
+    let clock = drift;
+    let slots: { x: number; w: number; char: string }[] = [];
+    let slotFont = "";
+    let slotColor = "";
     let last = 0;
     let lastDraw = 0;
     let frame = 0;
@@ -224,15 +230,46 @@ function useCardCanvas({
       return moving;
     };
 
+    // Lays out one slot per letter of the label, measured in the label's own
+    // font, so the ASCII can settle exactly where the real text will appear.
+    const measureSlots = () => {
+      const el = label.current;
+      if (!el || !width) return;
+      const style = getComputedStyle(el);
+      slotFont = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      slotColor = style.color;
+      ctx.font = slotFont;
+      if ("letterSpacing" in ctx) ctx.letterSpacing = style.letterSpacing;
+      const text = el.textContent ?? "";
+      const x0 = (width - ctx.measureText(text).width) / 2;
+      slots = [...text]
+        .map((char, k) => ({
+          x: x0 + ctx.measureText(text.slice(0, k)).width,
+          w: ctx.measureText(char).width,
+          char,
+        }))
+        .filter((slot) => slot.char !== " ");
+    };
+
+    const ease = (v: number) => (v < 0.5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2);
+
     const drawField = (now: number, dt: number) => {
       const target = over.current ? 1 : 0;
-      // A fresh hover from rest re-rolls the dissolve, so no two look alike.
-      if (target && !wasOver && strength < 0.02) roll++;
+      if (target && !wasOver && morph < 0.02) {
+        roll++;
+        measureSlots();
+      }
       wasOver = !!target;
-      strength += (target - strength) * (1 - Math.exp(-dt / (target ? 260 : 480)));
-      const t = drift + (reduced ? 0 : now / 1000);
+      if (reduced) morph = target;
+      else if (target) morph = Math.min(1, morph + dt / 1400);
+      else morph = Math.max(0, morph - dt / 800);
+      // The field eases to a stop while it gathers, so nothing pops mid-flight.
+      if (!reduced) clock += (dt / 1000) * (1 - smooth(morph * 5));
+      const t = clock;
       const intro = reduced ? 1 : start === null ? 0 : clamp((now - start) / (REVEAL_MS * 1.4));
       const phase = Math.floor(now / 140);
+      const text = smooth((morph - 0.5) / 0.2);
+      const handoff = smooth((morph - 0.86) / 0.14);
       ctx.clearRect(0, 0, width, height);
       for (let i = 0; i < cells.length; i++) {
         const cell = cells[i];
@@ -248,15 +285,44 @@ function useCardCanvas({
         const keep = tone - cell.scatter * 0.85;
         if (keep <= 0.2) continue;
         const arrive = smooth((intro * 1.3 - cell.scatter) / 0.3);
-        const order = scatter(i + salt + roll * 104729);
-        const span = 0.12 + scatter(i * 3 + salt + roll) * 0.3;
-        const gone = smooth((strength * (1 + span) - order) / span);
-        const alpha = Math.min(0.55, (keep - 0.2) * 1.1) * arrive * (1 - gone);
+        let alpha = Math.min(0.55, (keep - 0.2) * 1.1) * arrive;
         const char =
           keep > 0.55 ? flickerGlyph(tone, cell.seed >>> 8, phase) : keep > 0.38 ? ":" : ".";
-        glyph(char, col * cw, row * ch, alpha);
+        let x = col * cw;
+        let y = row * ch;
+        if (morph > 0 && slots.length) {
+          const u = ease(clamp((morph - scatter(i + salt + roll * 104729) * 0.28) / 0.42));
+          const slot = slots[Math.floor(scatter(i * 7 + salt + roll) * slots.length)];
+          const tx = slot.x + slot.w / 2 - cw / 2 + (scatter(i * 11 + roll) - 0.5) * 4;
+          const ty = height / 2 - ch / 2 + (scatter(i * 13 + roll) - 0.5) * 4;
+          x += (tx - x) * u;
+          y += (ty - y) * u;
+          alpha *= 1 - smooth((u - 0.86) / 0.14);
+        }
+        glyph(char, x, y, alpha);
+      }
+      if (text > 0 && handoff < 1 && slots.length) {
+        ctx.font = slotFont;
+        ctx.fillStyle = slotColor;
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "left";
+        ctx.globalAlpha = text * (1 - handoff);
+        const scramble = Math.floor(now / 55);
+        for (let k = 0; k < slots.length; k++) {
+          const slot = slots[k];
+          const settle = 0.64 + (k / slots.length) * 0.16 + scatter(k + roll) * 0.05;
+          const char =
+            morph >= settle ? slot.char : ATLAS[(scatter(k * 31 + roll) * 97 + scramble) % ATLAS.length | 0];
+          const offset = char === slot.char ? 0 : (slot.w - ctx.measureText(char).width) / 2;
+          ctx.fillText(char, slot.x + offset, height / 2);
+        }
       }
       ctx.globalAlpha = 1;
+      const el = label.current;
+      if (el) {
+        el.style.opacity = String(handoff);
+        el.style.filter = `blur(${(1 - handoff) * 4}px)`;
+      }
     };
 
     const tick = (now: number) => {
@@ -278,7 +344,7 @@ function useCardCanvas({
         return;
       }
       if (field) {
-        if (now - lastDraw >= 40 || over.current || strength > 0.01) {
+        if (now - lastDraw >= 40 || over.current || morph > 0) {
           drawField(now, Math.max(dt, now - lastDraw));
           lastDraw = now;
         }
@@ -348,12 +414,13 @@ function useCardCanvas({
       image.onload = null;
       image.onerror = null;
     };
-  }, [canvasRef, over, src, mobileSrc, delay]);
+  }, [canvasRef, over, label, src, mobileSrc, delay]);
 }
 
 export default function ProjectCard({ project, delay }: { project: Project; delay: number }) {
   const reduced = useReducedMotion();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
   const pointerOver = useRef(false);
   const [over, setOver] = useState(false);
   const field = !project.image;
@@ -361,6 +428,7 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
   useCardCanvas({
     canvasRef,
     over: pointerOver,
+    label: labelRef,
     src: project.image,
     mobileSrc: project.mobileImage,
     delay,
@@ -385,7 +453,7 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
     window.clearTimeout(tapTimer.current);
     const next = !pointerOver.current;
     show(next);
-    if (next) tapTimer.current = window.setTimeout(() => show(false), 2400);
+    if (next) tapTimer.current = window.setTimeout(() => show(false), 3200);
   };
 
   const body = (
@@ -416,11 +484,8 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
         />
         {field && (
           <span
-            className="absolute inset-0 flex items-center justify-center text-[13px] tracking-[0.01em] text-muted [transition-property:opacity,filter] duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-            style={{
-              opacity: over ? 1 : 0,
-              filter: over ? "blur(0px)" : "blur(6px)",
-            }}
+            ref={labelRef}
+            className="pointer-events-none absolute inset-0 flex items-center justify-center text-[13px] tracking-[0.01em] text-muted opacity-0"
           >
             Coming soon
           </span>
@@ -438,16 +503,18 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
         className="mt-3 flex items-center justify-between text-[15px]"
       >
         <span className={field ? "text-muted" : "text-ink"}>{project.name}</span>
-        <span
-          aria-hidden
-          className="text-muted [transition-property:opacity,filter] duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-          style={{
-            opacity: over ? 1 : 0,
-            filter: over ? "blur(0px)" : "blur(6px)",
-          }}
-        >
-          {project.href ? "↗" : "Soon"}
-        </span>
+        {project.href && (
+          <span
+            aria-hidden
+            className="text-muted [transition-property:opacity,filter] duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+            style={{
+              opacity: over ? 1 : 0,
+              filter: over ? "blur(0px)" : "blur(6px)",
+            }}
+          >
+            ↗
+          </span>
+        )}
       </motion.div>
     </>
   );
