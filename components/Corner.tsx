@@ -15,7 +15,7 @@ export default function Corner() {
 
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
         <In delay={0.5} className="order-2 sm:order-1">
-          <Links className="justify-between sm:justify-start" />
+          <Links className="justify-between px-3.5 max-[380px]:text-[13px] sm:justify-start sm:px-0" />
         </In>
         <In delay={0.58} className="order-1 w-full sm:order-2 sm:max-w-[17rem]">
           <Waitlist />
