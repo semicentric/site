@@ -22,7 +22,7 @@ export type Project = {
   name: string;
   href?: string;
   image?: string;
-  dim?: boolean;
+  note?: string;
 };
 
 const PAPER = "#f7f7f5";
@@ -39,11 +39,9 @@ function useCardCanvas({
   src,
   hover,
   delay,
-  dim,
   onDone,
 }: {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
-  dim: number;
   pointer: React.RefObject<Pointer>;
   src?: string;
   hover: HoverStyle;
@@ -291,7 +289,7 @@ function useCardCanvas({
         const arrive = smooth((intro * 1.3 - (xn * 0.55 + cell.scatter * 0.45)) / 0.3);
         const order = (1 - yn) * 0.45 + cell.scatter * 0.55;
         const gone = smooth((strength * 1.35 - order) / 0.35);
-        const alpha = Math.min(0.55, (keep - 0.2) * 1.1) * dim * arrive * (1 - gone);
+        const alpha = Math.min(0.55, (keep - 0.2) * 1.1) * arrive * (1 - gone);
         const char =
           keep > 0.55 ? flickerGlyph(tone, cell.seed >>> 8, phase) : keep > 0.38 ? ":" : ".";
         glyph(char, col * cw, row * ch - gone * ch * 3, alpha);
@@ -393,7 +391,7 @@ function useCardCanvas({
       image.onload = null;
       image.onerror = null;
     };
-  }, [canvasRef, pointer, src, hover, delay, dim]);
+  }, [canvasRef, pointer, src, hover, delay]);
 }
 
 export default function ProjectCard({
@@ -418,7 +416,6 @@ export default function ProjectCard({
     src: project.image,
     hover,
     delay,
-    dim: project.dim ? 0.45 : 1,
     onDone: () => setRevealed(true),
   });
 
@@ -447,7 +444,10 @@ export default function ProjectCard({
   const lift = hover === "lift" && revealed && !field;
   const body = (
     <>
-      <div
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: reduced ? 0 : delay, ease: EASE }}
         className="relative aspect-[4/5] w-full overflow-hidden bg-black/[0.025] outline outline-1 -outline-offset-1 outline-black/[0.06]"
         style={{ contain: "paint" }}
       >
@@ -469,7 +469,7 @@ export default function ProjectCard({
         />
         {field && (
           <span
-            className="absolute inset-0 flex items-center justify-center text-[13px] tracking-[0.01em] text-muted [transition-property:opacity,filter,translate] duration-500 ease-out"
+            className="absolute inset-0 flex flex-col items-center justify-center text-[13px] tracking-[0.01em] text-muted [transition-property:opacity,filter,translate] duration-500 ease-out"
             style={{
               opacity: over ? 1 : 0,
               filter: over ? "blur(0px)" : "blur(4px)",
@@ -477,9 +477,14 @@ export default function ProjectCard({
             }}
           >
             coming soon
+            {project.note && (
+              <span className="mt-1 max-w-[85%] text-center text-[12px] leading-snug text-faint">
+                {project.note}
+              </span>
+            )}
           </span>
         )}
-      </div>
+      </motion.div>
       <motion.div
         initial={{ opacity: 0, filter: reduced ? "blur(0px)" : "blur(6px)" }}
         animate={{ opacity: 1, filter: "blur(0px)" }}
