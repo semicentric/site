@@ -16,8 +16,6 @@ import {
 } from "./ascii";
 import { EASE } from "./shared";
 
-export type HoverStyle = "lens" | "scan" | "lift";
-
 export type Project = {
   name: string;
   href?: string;
@@ -25,34 +23,24 @@ export type Project = {
   note?: string;
 };
 
-const PAPER = "#f7f7f5";
+// The page paper under the tile's 2.5% black wash.
+const PAPER = "#f1f1ef";
 const INK = "#101010";
 const REVEAL_MS = 900;
-const FINISH_MS = 950;
-const SCAN_MS = 760;
-
-type Pointer = { x: number; y: number; over: boolean; enteredAt: number };
+const RESOLVE_MS = 820;
+const RETURN_MS = 620;
 
 function useCardCanvas({
   canvasRef,
-  pointer,
+  over,
   src,
-  hover,
   delay,
-  onDone,
 }: {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
-  pointer: React.RefObject<Pointer>;
+  over: React.RefObject<boolean>;
   src?: string;
-  hover: HoverStyle;
   delay: number;
-  onDone: () => void;
 }) {
-  const done = useRef(onDone);
-  useEffect(() => {
-    done.current = onDone;
-  }, [onDone]);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -66,6 +54,9 @@ function useCardCanvas({
 
     const field = !src;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Without a pointer that can hover, the image would never be seen, so
+    // touch devices resolve it once the ASCII has landed.
+    const touch = window.matchMedia("(hover: none), (pointer: coarse)").matches;
     const image = new window.Image();
     let cells: Cell[] = [];
     let width = 0;
@@ -77,23 +68,14 @@ function useCardCanvas({
     let aw = 0;
     let ah = 0;
     let start: number | null = null;
-    let fadeStart: number | null = null;
-    let revealed = false;
+    let landed = false;
+    let resolve = 0;
     let strength = 0;
-    let lensX = 0;
-    let lensY = 0;
     let last = 0;
     let lastDraw = 0;
     let frame = 0;
     let visible = false;
     let disposed = false;
-
-    const finishReveal = () => {
-      if (revealed) return;
-      revealed = true;
-      canvas.style.background = "transparent";
-      done.current();
-    };
 
     const layout = () => {
       const bounds = canvas.getBoundingClientRect();
@@ -170,105 +152,50 @@ function useCardCanvas({
       ctx.drawImage(mask, 0, 0, width, height);
     };
 
-    const drawReveal = (now: number) => {
+    // One pass draws every state: the ASCII landing (p < 1), the resting
+    // glyphs, and the hover resolve into the image (r > 0).
+    const drawImageCard = (now: number) => {
       const elapsed = now - (start ?? now);
-      const p = clamp(elapsed / REVEAL_MS);
+      const p = reduced ? 1 : clamp(elapsed / REVEAL_MS);
       const coverage = -0.06 + (1 - Math.pow(1 - p, 2.2)) * 1.3;
-      const phase = Math.floor(elapsed / 85);
-      if (fadeStart === null && p >= 0.8) fadeStart = now;
-      const f = fadeStart === null ? 0 : clamp((now - fadeStart) / FINISH_MS);
+      const phase = Math.floor(now / 85);
+      const r = resolve;
+      const moving = p < 1 || (r > 0 && r < 1);
       const backing = new Float32Array(cells.length);
       ctx.clearRect(0, 0, width, height);
       for (let i = 0; i < cells.length; i++) {
-        const cell = cells[i];
-        const col = i % columns;
-        const order = sweepOrder(col, columns, cell);
-        const drop = smooth((f - clamp(order) * 0.5) / 0.38);
-        backing[i] = 1 - drop;
+        const order = clamp(sweepOrder(i % columns, columns, cells[i]));
+        backing[i] = 1 - smooth((r - order * 0.5) / 0.38);
       }
       paintMask(backing);
       for (let i = 0; i < cells.length; i++) {
         const cell = cells[i];
         const col = i % columns;
-        const order = sweepOrder(col, columns, cell);
-        const age = clamp((coverage - order) * 5);
+        const raw = sweepOrder(col, columns, cell);
+        const order = clamp(raw);
+        const age = clamp((coverage - raw) * 5);
         if (age <= 0) continue;
         const density = Math.min(1, cell.tone * 0.9 + cell.edge * 0.2);
+        const local = clamp((r - order * 0.5) / 0.45);
         const char =
           age < 0.45
             ? streakGlyph(cell.seed >>> 4)
-            : p < 0.9 && age < 0.9
+            : (p < 0.9 && age < 0.9) || (local > 0 && local < 0.8)
               ? flickerGlyph(density, cell.seed >>> 8, phase)
               : densityGlyph(density);
-        const settle = 1 - smooth((f - clamp(order) * 0.5 - 0.1) / 0.32);
+        const settle = 1 - smooth((r - order * 0.5 - 0.1) / 0.32);
         const base = (0.08 + cell.prominence * 0.88) * smooth(age);
-        const lift = base + (0.9 - base) * smooth(f / 0.35) * cell.prominence;
+        const lift = base + (0.9 - base) * smooth(r / 0.35) * cell.prominence;
         glyph(char, col * cw, Math.floor(i / columns) * ch, lift * settle);
       }
       ctx.globalAlpha = 1;
-      return f >= 1;
-    };
-
-    const drawHover = (now: number, dt: number) => {
-      const p = pointer.current;
-      const target = p.over ? 1 : 0;
-      strength += (target - strength) * (1 - Math.exp(-dt / (target ? 110 : 220)));
-      lensX += (p.x - lensX) * (1 - Math.exp(-dt / 60));
-      lensY += (p.y - lensY) * (1 - Math.exp(-dt / 60));
-      ctx.clearRect(0, 0, width, height);
-      if (hover === "lift") return false;
-      const active = p.over || strength > 0.002;
-
-      const backing = new Float32Array(cells.length);
-      const strengths = new Float32Array(cells.length);
-      const phase = Math.floor(now / 95);
-      let any = false;
-      let pos = 0;
-      let band = 0;
-      if (hover === "scan") {
-        const t = clamp((now - p.enteredAt) / SCAN_MS);
-        band = width * 0.22;
-        pos = -band + (width + band * 2) * (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
-        if (t >= 1) return false;
-      }
-      const radius = Math.max(width, height) * 0.3;
-      for (let i = 0; i < cells.length; i++) {
-        const cx = ((i % columns) + 0.5) * cw;
-        const cy = (Math.floor(i / columns) + 0.5) * ch;
-        let k: number;
-        if (hover === "lens") {
-          const d = Math.hypot(cx - lensX, cy - lensY) / radius;
-          k = strength * (1 - smooth(d + cells[i].scatter * 0.18 - 0.1));
-        } else {
-          k = 1 - smooth(Math.abs(cx - pos) / band + cells[i].scatter * 0.25);
-        }
-        if (k > 0.01) any = true;
-        strengths[i] = k;
-        backing[i] = k * 0.95;
-      }
-      if (!any) return hover === "scan" || active;
-      paintMask(backing);
-      for (let i = 0; i < cells.length; i++) {
-        const k = strengths[i];
-        if (k <= 0.01) continue;
-        const cell = cells[i];
-        const cx = ((i % columns) + 0.5) * cw;
-        const density = Math.min(1, cell.tone * 0.9 + cell.edge * 0.2);
-        const char =
-          hover === "scan" && cx > pos
-            ? streakGlyph(cell.seed >>> 4)
-            : k < 0.7
-              ? flickerGlyph(density, cell.seed >>> 8, phase)
-              : densityGlyph(density);
-        glyph(char, (i % columns) * cw, Math.floor(i / columns) * ch, k * (0.12 + cell.prominence * 0.85));
-      }
-      ctx.globalAlpha = 1;
-      return true;
+      if (p >= 1) landed = true;
+      return moving;
     };
 
     const drawField = (now: number, dt: number) => {
-      const p = pointer.current;
-      strength += ((p.over ? 1 : 0) - strength) * (1 - Math.exp(-dt / (p.over ? 260 : 480)));
+      const target = over.current ? 1 : 0;
+      strength += (target - strength) * (1 - Math.exp(-dt / (target ? 260 : 480)));
       const t = reduced ? 0 : now / 1000;
       const intro = reduced ? 1 : start === null ? 0 : clamp((now - start) / (REVEAL_MS * 1.4));
       const phase = Math.floor(now / 140);
@@ -295,8 +222,6 @@ function useCardCanvas({
         glyph(char, col * cw, row * ch - gone * ch * 3, alpha);
       }
       ctx.globalAlpha = 1;
-      if (intro >= 1 && !revealed) finishReveal();
-      return false;
     };
 
     const tick = (now: number) => {
@@ -308,7 +233,7 @@ function useCardCanvas({
         last = 0;
         return;
       }
-      if (start === null) start = now + delay * 1000;
+      if (start === null) start = now + (reduced ? 0 : delay * 1000);
       if (now < start) {
         frame = requestAnimationFrame(tick);
         return;
@@ -318,23 +243,21 @@ function useCardCanvas({
         return;
       }
       if (field) {
-        if (now - lastDraw >= 40 || pointer.current.over || strength > 0.01) {
+        if (now - lastDraw >= 40 || over.current || strength > 0.01) {
           drawField(now, Math.max(dt, now - lastDraw));
           lastDraw = now;
         }
-        frame = requestAnimationFrame(tick);
+        if (!reduced) frame = requestAnimationFrame(tick);
         return;
       }
-      if (!revealed) {
-        canvas.style.background = "transparent";
-        if (drawReveal(now)) {
-          ctx.clearRect(0, 0, width, height);
-          finishReveal();
-        }
-        frame = requestAnimationFrame(tick);
-        return;
-      }
-      if (drawHover(now, dt)) frame = requestAnimationFrame(tick);
+      canvas.style.background = "transparent";
+      const target = landed && (over.current || touch) ? 1 : 0;
+      if (reduced) resolve = target;
+      else if (resolve < target) resolve = Math.min(1, resolve + dt / RESOLVE_MS);
+      else if (resolve > target) resolve = Math.max(0, resolve - dt / RETURN_MS);
+      const moving = drawImageCard(now);
+      const next = landed && (over.current || touch) ? 1 : 0;
+      if (moving || resolve !== next || !landed) frame = requestAnimationFrame(tick);
     };
 
     const wake = () => {
@@ -347,7 +270,6 @@ function useCardCanvas({
       if (cells.length) {
         cells = [];
         layout();
-        if (revealed && !field) ctx.clearRect(0, 0, width, height);
       }
       wake();
     };
@@ -362,24 +284,17 @@ function useCardCanvas({
     ro.observe(canvas);
     document.addEventListener("visibilitychange", wake);
 
-    if (field) {
-      wake();
-    } else if (reduced) {
-      finishReveal();
-      image.src = src;
+    if (!field) {
       image.onload = () => {
         layout();
         wake();
       };
-    } else {
-      image.onload = () => {
-        layout();
-        wake();
+      image.onerror = () => {
+        canvas.style.opacity = "0";
       };
-      image.onerror = finishReveal;
       image.src = src;
-      if (image.complete && image.naturalWidth) layout();
     }
+    wake();
 
     return () => {
       disposed = true;
@@ -391,57 +306,25 @@ function useCardCanvas({
       image.onload = null;
       image.onerror = null;
     };
-  }, [canvasRef, pointer, src, hover, delay]);
+  }, [canvasRef, over, src, delay]);
 }
 
-export default function ProjectCard({
-  project,
-  hover,
-  delay,
-}: {
-  project: Project;
-  hover: HoverStyle;
-  delay: number;
-}) {
+export default function ProjectCard({ project, delay }: { project: Project; delay: number }) {
   const reduced = useReducedMotion();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pointer = useRef<Pointer>({ x: 0, y: 0, over: false, enteredAt: 0 });
-  const [revealed, setRevealed] = useState(false);
+  const pointerOver = useRef(false);
   const [over, setOver] = useState(false);
   const field = !project.image;
 
-  useCardCanvas({
-    canvasRef,
-    pointer,
-    src: project.image,
-    hover,
-    delay,
-    onDone: () => setRevealed(true),
-  });
+  useCardCanvas({ canvasRef, over: pointerOver, src: project.image, delay });
 
-  const move = (e: React.PointerEvent) => {
+  const set = (value: boolean) => (e: React.PointerEvent) => {
     if (e.pointerType !== "mouse") return;
-    const r = e.currentTarget.getBoundingClientRect();
-    pointer.current.x = e.clientX - r.left;
-    pointer.current.y = e.clientY - r.top;
-  };
-
-  const enter = (e: React.PointerEvent) => {
-    if (e.pointerType !== "mouse") return;
-    move(e);
-    pointer.current.over = true;
-    pointer.current.enteredAt = performance.now();
-    setOver(true);
+    pointerOver.current = value;
+    setOver(value);
     canvasRef.current?.dispatchEvent(new Event("card:wake"));
   };
 
-  const leave = () => {
-    pointer.current.over = false;
-    setOver(false);
-    canvasRef.current?.dispatchEvent(new Event("card:wake"));
-  };
-
-  const lift = hover === "lift" && revealed && !field;
   const body = (
     <>
       <motion.div
@@ -457,8 +340,7 @@ export default function ProjectCard({
             src={project.image}
             alt=""
             draggable={false}
-            className="absolute inset-0 h-full w-full select-none object-cover [transition:scale_600ms_var(--ease-out)]"
-            style={{ scale: lift && over ? "1.035" : "1" }}
+            className="absolute inset-0 h-full w-full select-none object-cover"
           />
         )}
         <canvas
@@ -476,7 +358,7 @@ export default function ProjectCard({
               translate: over ? "0 0" : "0 4px",
             }}
           >
-            coming soon
+            Coming soon
             {project.note && (
               <span className="mt-1 max-w-[85%] text-center text-[12px] leading-snug text-faint">
                 {project.note}
@@ -500,7 +382,7 @@ export default function ProjectCard({
             translate: over ? "0 0" : "-4px 4px",
           }}
         >
-          {project.href ? "↗" : "soon"}
+          {project.href ? "↗" : "Soon"}
         </span>
       </motion.div>
     </>
@@ -510,16 +392,15 @@ export default function ProjectCard({
 
   if (!project.href)
     return (
-      <div onPointerEnter={enter} onPointerMove={move} onPointerLeave={leave} className={frame}>
+      <div onPointerEnter={set(true)} onPointerLeave={set(false)} className={frame}>
         {body}
       </div>
     );
 
   return (
     <a
-      onPointerEnter={enter}
-      onPointerMove={move}
-      onPointerLeave={leave}
+      onPointerEnter={set(true)}
+      onPointerLeave={set(false)}
       href={project.href}
       target="_blank"
       rel="noopener noreferrer"

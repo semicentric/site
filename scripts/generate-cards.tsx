@@ -50,19 +50,16 @@ const NEPTUNE = {
 };
 
 const HEX = [
-  "7f 45 4c 46 02 01 01 00 00 00",
-  "02 00 b7 00 01 00 00 00 e0 0b",
-  "fd 7b bf a9 fd 03 00 91 f3 53",
-  "e1 03 00 aa 20 00 80 52 c0 03",
-  "1f 20 03 d5 ff 43 00 d1 e0 07",
+  "7f 45 4c 46 02 01 01 00",
+  "fd 7b bf a9 fd 03 00 91",
+  "1f 20 03 d5 ff 43 00 d1",
 ];
 
 const SOURCE = [
   "int main(int argc, char **argv)",
   "{",
-  "    if (argc < 2)",
-  "        return usage();",
   "    return patch(argv[1]);",
+  "}",
 ];
 
 await render(
@@ -76,20 +73,20 @@ await render(
       justifyContent: "space-between",
       backgroundColor: NEPTUNE.bg,
       color: NEPTUNE.ink,
-      padding: "76px 68px",
+      padding: "104px 96px",
       fontFamily: "Overused Grotesk",
     }}
   >
-    <span style={{ fontSize: 62, letterSpacing: "-0.02em", lineHeight: 1 }}>
+    <span style={{ fontSize: 52, letterSpacing: "-0.02em", lineHeight: 1 }}>
       Closed binaries in
     </span>
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 44 }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 40 }}>
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           fontFamily: "Fragment Mono",
-          fontSize: 25,
+          fontSize: 21,
           lineHeight: 1.5,
           color: NEPTUNE.faint,
           alignSelf: "flex-start",
@@ -108,11 +105,11 @@ await render(
           display: "flex",
           flexDirection: "column",
           fontFamily: "Fragment Mono",
-          fontSize: 25,
+          fontSize: 21,
           lineHeight: 1.5,
           color: NEPTUNE.dim,
           alignSelf: "flex-end",
-          width: 520,
+          width: 420,
         }}
       >
         {SOURCE.map((l) => (
@@ -124,7 +121,7 @@ await render(
     </div>
     <span
       style={{
-        fontSize: 62,
+        fontSize: 52,
         letterSpacing: "-0.02em",
         lineHeight: 1,
         alignSelf: "flex-end",
@@ -144,7 +141,7 @@ const PALISADE = {
   mark: "M 200,25 L 230,85 L 230,375 L 170,375 L 170,85 Z M 63.786797,293.786797 L 293.786797,63.786797 L 336.213203,106.213203 L 106.213203,336.213203 Z",
 };
 
-const PICKET = "^  \n|==\n|  \n|==\n|  ";
+const PICKET = "^  \n|==\n|  ";
 const PICKET_COUNT = 16;
 
 function Highlight({ children }: { children: string }) {
@@ -177,11 +174,11 @@ await render(
       overflow: "hidden",
     }}
   >
-    <div style={{ display: "flex", alignItems: "center", gap: 18, padding: "76px 72px 0 72px" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "104px 96px 0 96px" }}>
       <svg width={52} height={52} viewBox="0 0 400 400">
         <path fill={PALISADE.ink} fill-rule="evenodd" d={PALISADE.mark} />
       </svg>
-      <span style={{ fontFamily: "Archivo", fontSize: 46, fontWeight: 700, letterSpacing: "-0.02em" }}>
+      <span style={{ fontFamily: "Archivo", fontSize: 38, fontWeight: 700, letterSpacing: "-0.02em" }}>
         Palisade
       </span>
     </div>
@@ -191,8 +188,8 @@ await render(
         flexDirection: "column",
         flexGrow: 1,
         justifyContent: "center",
-        padding: "0 72px",
-        gap: 36,
+        padding: "0 96px",
+        gap: 32,
       }}
     >
       <div
@@ -200,7 +197,7 @@ await render(
           display: "flex",
           flexDirection: "column",
           fontFamily: "Archivo",
-          fontSize: 100,
+          fontSize: 80,
           fontWeight: 700,
           letterSpacing: "-0.02em",
           lineHeight: 1.06,
@@ -211,7 +208,7 @@ await render(
         <Highlight>never</Highlight>
         <Highlight>crosses.</Highlight>
       </div>
-      <span style={{ fontFamily: "Fragment Mono", fontSize: 26, color: PALISADE.muted }}>
+      <span style={{ fontFamily: "Fragment Mono", fontSize: 22, color: PALISADE.muted }}>
         PII firewall for cloud LLM agents.
       </span>
     </div>
@@ -220,9 +217,9 @@ await render(
         display: "flex",
         whiteSpace: "nowrap",
         fontFamily: "Fragment Mono",
-        fontSize: 30,
+        fontSize: 26,
         lineHeight: 1.2,
-        paddingLeft: 8,
+        padding: "0 0 40px 10px",
       }}
     >
       {Array.from({ length: PICKET_COUNT }, (_, i) => (
