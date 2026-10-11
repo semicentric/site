@@ -13,11 +13,11 @@ export default function Corner() {
         <Projects />
       </div>
 
-      <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
-        <In delay={0.5}>
-          <Links />
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+        <In delay={0.5} className="order-2 sm:order-1">
+          <Links className="justify-between sm:justify-start" />
         </In>
-        <In delay={0.58} className="w-full max-w-[17rem]">
+        <In delay={0.58} className="order-1 w-full sm:order-2 sm:max-w-[17rem]">
           <Waitlist />
         </In>
       </div>
