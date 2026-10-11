@@ -332,11 +332,12 @@ function useCardCanvas({
       const shown = Math.round(handoff * 100) / 100;
       if (el && shown !== labelShown) {
         labelShown = shown;
+        // Stay in shadow mode even at rest (a zero-blur shadow is the crisp
+        // text); swapping back to real glyphs at either end flickers.
         labelColor ||= getComputedStyle(el).color;
-        const soft = shown > 0 && shown < 1;
         el.style.opacity = String(shown);
-        el.style.color = soft ? "transparent" : "";
-        el.style.textShadow = soft ? `0 0 ${(1 - shown) * 8}px ${labelColor}` : "none";
+        el.style.color = "transparent";
+        el.style.textShadow = `0 0 ${(1 - shown) * 8}px ${labelColor}`;
       }
     };
 
