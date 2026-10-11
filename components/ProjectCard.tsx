@@ -366,11 +366,26 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
     delay,
   });
 
-  const set = (value: boolean) => (e: React.PointerEvent) => {
-    if (e.pointerType !== "mouse") return;
+  const show = (value: boolean) => {
     pointerOver.current = value;
     setOver(value);
     canvasRef.current?.dispatchEvent(new Event("card:wake"));
+  };
+
+  const set = (value: boolean) => (e: React.PointerEvent) => {
+    if (e.pointerType === "mouse") show(value);
+  };
+
+  // Touch has no hover, so a tap on a coming-soon card plays the same
+  // dissolve and lets it settle back on its own.
+  const tapTimer = useRef(0);
+  useEffect(() => () => window.clearTimeout(tapTimer.current), []);
+  const tap = () => {
+    if (!window.matchMedia("(hover: none)").matches) return;
+    window.clearTimeout(tapTimer.current);
+    const next = !pointerOver.current;
+    show(next);
+    if (next) tapTimer.current = window.setTimeout(() => show(false), 2400);
   };
 
   const body = (
@@ -441,7 +456,12 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
 
   if (!project.href)
     return (
-      <div onPointerEnter={set(true)} onPointerLeave={set(false)} className={frame}>
+      <div
+        onPointerEnter={set(true)}
+        onPointerLeave={set(false)}
+        onClick={tap}
+        className={`${frame} cursor-default`}
+      >
         {body}
       </div>
     );
