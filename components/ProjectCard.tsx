@@ -91,12 +91,11 @@ function useCardCanvas({
     let roll = 0;
     let wasOver = false;
     let morph = 0;
-    let labelShown = 0;
-    let labelColor = "";
     let gathered = false;
     let clock = drift;
     let slots: { x: number; w: number; char: string }[] = [];
     let slotFont = "";
+    let slotSpacing = "0px";
     let slotColor = "";
     let last = 0;
     let lastDraw = 0;
@@ -242,7 +241,8 @@ function useCardCanvas({
       slotFont = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
       slotColor = style.color;
       ctx.font = slotFont;
-      if ("letterSpacing" in ctx) ctx.letterSpacing = style.letterSpacing;
+      slotSpacing = style.letterSpacing;
+      if ("letterSpacing" in ctx) ctx.letterSpacing = slotSpacing;
       const text = el.textContent ?? "";
       const x0 = (width - ctx.measureText(text).width) / 2;
       slots = [...text]
@@ -276,7 +276,6 @@ function useCardCanvas({
       const intro = reduced ? 1 : start === null ? 0 : clamp((now - start) / (REVEAL_MS * 1.4));
       const phase = Math.floor(now / 140);
       const text = smooth((morph - 0.5) / 0.2);
-      const handoff = smooth((morph - 0.86) / 0.14);
       ctx.clearRect(0, 0, width, height);
       for (let i = 0; i < cells.length; i++) {
         const cell = cells[i];
@@ -308,12 +307,15 @@ function useCardCanvas({
         }
         glyph(char, x, y, alpha);
       }
-      if (text > 0 && handoff < 1 && slots.length) {
+      // The canvas keeps the finished label itself. Handing off to DOM text
+      // meant fading a page element, which flickered on iOS at both ends.
+      if (text > 0 && slots.length) {
         ctx.font = slotFont;
+        if ("letterSpacing" in ctx) ctx.letterSpacing = slotSpacing;
         ctx.fillStyle = slotColor;
         ctx.textBaseline = "middle";
         ctx.textAlign = "left";
-        ctx.globalAlpha = text * (1 - handoff);
+        ctx.globalAlpha = text;
         const scramble = Math.floor(now / 55);
         for (let k = 0; k < slots.length; k++) {
           const slot = slots[k];
@@ -325,20 +327,6 @@ function useCardCanvas({
         }
       }
       ctx.globalAlpha = 1;
-      // The soft focus is a text-shadow rather than filter: blur(). WebKit
-      // paints a hairline along the top of a blur filter's outset region on
-      // iOS, which showed above the label while it faded.
-      const el = label.current;
-      const shown = Math.round(handoff * 100) / 100;
-      if (el && shown !== labelShown) {
-        labelShown = shown;
-        // Stay in shadow mode even at rest (a zero-blur shadow is the crisp
-        // text); swapping back to real glyphs at either end flickers.
-        labelColor ||= getComputedStyle(el).color;
-        el.style.opacity = String(shown);
-        el.style.color = "transparent";
-        el.style.textShadow = `0 0 ${(1 - shown) * 8}px ${labelColor}`;
-      }
     };
 
     const tick = (now: number) => {
@@ -387,6 +375,11 @@ function useCardCanvas({
       if (cells.length) {
         cells = [];
         layout();
+        // Resizing clears the canvas, so redraw the label even if gathered.
+        if (field) {
+          gathered = false;
+          measureSlots();
+        }
       }
       wake();
     };
@@ -417,6 +410,8 @@ function useCardCanvas({
       image.src = pick();
     };
     narrow.addEventListener("change", swap);
+    // Canvas text never triggers web-font loading, so measure once it lands.
+    if (field) document.fonts.ready.then(() => !disposed && measureSlots());
     wake();
 
     return () => {
