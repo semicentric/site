@@ -20,7 +20,10 @@ export type Project = {
   name: string;
   href?: string;
   image?: string;
+  mobileImage?: string;
 };
+
+const NARROW = "(max-width: 767px)";
 
 // The page paper under the tile's 2.5% black wash.
 const PAPER = "#f1f1ef";
@@ -33,11 +36,13 @@ function useCardCanvas({
   canvasRef,
   over,
   src,
+  mobileSrc,
   delay,
 }: {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   over: React.RefObject<boolean>;
   src?: string;
+  mobileSrc?: string;
   delay: number;
 }) {
   useEffect(() => {
@@ -56,6 +61,8 @@ function useCardCanvas({
     // Without a pointer that can hover, the image would never be seen, so
     // touch devices resolve it once the ASCII has landed.
     const touch = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    const narrow = window.matchMedia(NARROW);
+    const pick = () => (narrow.matches && mobileSrc) || src || "";
     const image = new window.Image();
     let cells: Cell[] = [];
     let width = 0;
@@ -70,6 +77,8 @@ function useCardCanvas({
     let landed = false;
     let resolve = 0;
     let strength = 0;
+    let roll = 0;
+    let wasOver = false;
     let last = 0;
     let lastDraw = 0;
     let frame = 0;
@@ -194,6 +203,9 @@ function useCardCanvas({
 
     const drawField = (now: number, dt: number) => {
       const target = over.current ? 1 : 0;
+      // A fresh hover from rest re-rolls the dissolve, so no two look alike.
+      if (target && !wasOver && strength < 0.02) roll++;
+      wasOver = !!target;
       strength += (target - strength) * (1 - Math.exp(-dt / (target ? 260 : 480)));
       const t = reduced ? 0 : now / 1000;
       const intro = reduced ? 1 : start === null ? 0 : clamp((now - start) / (REVEAL_MS * 1.4));
@@ -212,8 +224,10 @@ function useCardCanvas({
         const tone = smooth((wave + 1.6) / 3.2);
         const keep = tone - cell.scatter * 0.85;
         if (keep <= 0.2) continue;
-        const arrive = smooth((intro * 1.3 - (xn * 0.55 + cell.scatter * 0.45)) / 0.3);
-        const gone = smooth((strength * 1.3 - (xn * 0.45 + cell.scatter * 0.55)) / 0.3);
+        const arrive = smooth((intro * 1.3 - cell.scatter) / 0.3);
+        const order = scatter(i + roll * 104729);
+        const span = 0.12 + scatter(i * 3 + roll) * 0.3;
+        const gone = smooth((strength * (1 + span) - order) / span);
         const alpha = Math.min(0.55, (keep - 0.2) * 1.1) * arrive * (1 - gone);
         const char =
           keep > 0.55 ? flickerGlyph(tone, cell.seed >>> 8, phase) : keep > 0.38 ? ":" : ".";
@@ -290,8 +304,14 @@ function useCardCanvas({
       image.onerror = () => {
         canvas.style.opacity = "0";
       };
-      image.src = src;
+      image.src = pick();
     }
+    const swap = () => {
+      if (field) return;
+      cells = [];
+      image.src = pick();
+    };
+    narrow.addEventListener("change", swap);
     wake();
 
     return () => {
@@ -301,10 +321,11 @@ function useCardCanvas({
       io.disconnect();
       ro.disconnect();
       document.removeEventListener("visibilitychange", wake);
+      narrow.removeEventListener("change", swap);
       image.onload = null;
       image.onerror = null;
     };
-  }, [canvasRef, over, src, delay]);
+  }, [canvasRef, over, src, mobileSrc, delay]);
 }
 
 export default function ProjectCard({ project, delay }: { project: Project; delay: number }) {
@@ -314,7 +335,13 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
   const [over, setOver] = useState(false);
   const field = !project.image;
 
-  useCardCanvas({ canvasRef, over: pointerOver, src: project.image, delay });
+  useCardCanvas({
+    canvasRef,
+    over: pointerOver,
+    src: project.image,
+    mobileSrc: project.mobileImage,
+    delay,
+  });
 
   const set = (value: boolean) => (e: React.PointerEvent) => {
     if (e.pointerType !== "mouse") return;
@@ -333,13 +360,15 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
         style={{ contain: "paint" }}
       >
         {project.image && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={project.image}
-            alt=""
-            draggable={false}
-            className="absolute inset-0 h-full w-full select-none object-cover"
-          />
+          <picture>
+            {project.mobileImage && <source media={NARROW} srcSet={project.mobileImage} />}
+            <img
+              src={project.image}
+              alt=""
+              draggable={false}
+              className="absolute inset-0 h-full w-full select-none object-cover"
+            />
+          </picture>
         )}
         <canvas
           ref={canvasRef}

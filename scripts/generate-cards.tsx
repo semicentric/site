@@ -253,3 +253,102 @@ await render(
     </div>
   </div>,
 );
+
+// Phone cards render at roughly 165px wide, so these keep one idea per card
+// at type sizes that survive that scale.
+await render(
+  "neptune-mobile",
+  <div
+    style={{
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      backgroundColor: NEPTUNE.bg,
+      color: NEPTUNE.ink,
+      padding: "88px 80px",
+      fontFamily: "Overused Grotesk",
+      fontSize: 96,
+      letterSpacing: "-0.025em",
+      lineHeight: 1,
+    }}
+  >
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      <span>Closed</span>
+      <span>binaries in</span>
+    </div>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <svg width={150} height={168} viewBox="0 0 256 286">
+        <path fill={NEPTUNE.ink} d={NEPTUNE.mark} />
+        <path fill={NEPTUNE.ink} d={NEPTUNE.bar} />
+      </svg>
+    </div>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+      <span>Open</span>
+      <span>source out</span>
+    </div>
+  </div>,
+);
+
+await render(
+  "palisade-mobile",
+  <div
+    style={{
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      backgroundColor: PALISADE.bg,
+      color: PALISADE.ink,
+      overflow: "hidden",
+    }}
+  >
+    <div style={{ display: "flex", padding: "88px 80px 0 80px" }}>
+      <svg width={96} height={96} viewBox="0 0 400 400">
+        <path fill={PALISADE.ink} fill-rule="evenodd" d={PALISADE.mark} />
+      </svg>
+    </div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        padding: "0 80px",
+        fontFamily: "Archivo",
+        fontSize: 104,
+        fontWeight: 700,
+        letterSpacing: "-0.02em",
+        lineHeight: 1.04,
+      }}
+    >
+      <span>The line</span>
+      <span>your data</span>
+      <Highlight>never</Highlight>
+      <Highlight>crosses.</Highlight>
+    </div>
+    <div
+      style={{
+        display: "flex",
+        whiteSpace: "nowrap",
+        fontFamily: "Fragment Mono",
+        fontSize: 44,
+        lineHeight: 1.15,
+        padding: "0 0 36px 14px",
+      }}
+    >
+      {Array.from({ length: 10 }, (_, i) => (
+        <span
+          key={i}
+          style={{
+            flexShrink: 0,
+            whiteSpace: "pre",
+            color: i % 4 === 2 ? PALISADE.accent : PALISADE.picket,
+          }}
+        >
+          {PICKET}
+        </span>
+      ))}
+    </div>
+  </div>,
+);

@@ -4,8 +4,18 @@ import ProjectCard, { type Project } from "./ProjectCard";
 import { AFTER_S } from "./shared";
 
 const PROJECTS: Project[] = [
-  { name: "Neptune", href: "https://neptune.rip", image: "/projects/neptune.png" },
-  { name: "Palisade", href: "https://palisade.rocks", image: "/projects/palisade.png" },
+  {
+    name: "Neptune",
+    href: "https://neptune.rip",
+    image: "/projects/neptune.png",
+    mobileImage: "/projects/neptune-mobile.png",
+  },
+  {
+    name: "Palisade",
+    href: "https://palisade.rocks",
+    image: "/projects/palisade.png",
+    mobileImage: "/projects/palisade-mobile.png",
+  },
   { name: "Evanescent" },
   { name: "SRAM" },
 ];
