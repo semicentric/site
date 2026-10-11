@@ -57,6 +57,16 @@ function useCardCanvas({
     if (!canvas || !ctx || !maskCtx || !atlasCtx || !sampler) return;
 
     const field = !src;
+    // Each card rolls its own field so two coming-soon cards never match.
+    const salt = Math.floor(Math.random() * 1e6);
+    const roll01 = (k: number) => scatter(salt + k * 7919);
+    const fx = 6 + roll01(1) * 3;
+    const fy = 4.5 + roll01(2) * 2;
+    const px = roll01(3) * Math.PI * 2;
+    const py = roll01(4) * Math.PI * 2;
+    const fd = 4.3 * (0.8 + roll01(5) * 0.4);
+    const dir = roll01(6) > 0.5 ? 1 : -1;
+    const drift = roll01(7) * 100;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // Without a pointer that can hover, the image would never be seen, so
     // touch devices resolve it once the ASCII has landed.
@@ -116,7 +126,7 @@ function useCardCanvas({
           edge: 0,
           prominence: 0,
           seed: Math.imul(i + 1, 2654435761) >>> 0,
-          scatter: scatter(i),
+          scatter: scatter(i + salt),
         }));
         return true;
       }
@@ -207,7 +217,7 @@ function useCardCanvas({
       if (target && !wasOver && strength < 0.02) roll++;
       wasOver = !!target;
       strength += (target - strength) * (1 - Math.exp(-dt / (target ? 260 : 480)));
-      const t = reduced ? 0 : now / 1000;
+      const t = drift + (reduced ? 0 : now / 1000);
       const intro = reduced ? 1 : start === null ? 0 : clamp((now - start) / (REVEAL_MS * 1.4));
       const phase = Math.floor(now / 140);
       ctx.clearRect(0, 0, width, height);
@@ -218,15 +228,15 @@ function useCardCanvas({
         const xn = col / columns;
         const yn = row / rows;
         const wave =
-          Math.sin(xn * 7.2 + t * 0.55 + Math.sin(yn * 3.1 - t * 0.3) * 1.4) *
-            Math.cos(yn * 5.4 - t * 0.42) +
-          Math.sin((xn + yn) * 4.3 - t * 0.36) * 0.6;
+          Math.sin(xn * fx + px + t * 0.55 + Math.sin(yn * 3.1 - t * 0.3) * 1.4) *
+            Math.cos(yn * fy + py - t * 0.42) +
+          Math.sin((xn * dir + yn) * fd - t * 0.36) * 0.6;
         const tone = smooth((wave + 1.6) / 3.2);
         const keep = tone - cell.scatter * 0.85;
         if (keep <= 0.2) continue;
         const arrive = smooth((intro * 1.3 - cell.scatter) / 0.3);
-        const order = scatter(i + roll * 104729);
-        const span = 0.12 + scatter(i * 3 + roll) * 0.3;
+        const order = scatter(i + salt + roll * 104729);
+        const span = 0.12 + scatter(i * 3 + salt + roll) * 0.3;
         const gone = smooth((strength * (1 + span) - order) / span);
         const alpha = Math.min(0.55, (keep - 0.2) * 1.1) * arrive * (1 - gone);
         const char =
