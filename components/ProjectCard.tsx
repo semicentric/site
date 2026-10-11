@@ -92,6 +92,7 @@ function useCardCanvas({
     let wasOver = false;
     let morph = 0;
     let labelShown = 0;
+    let labelColor = "";
     let gathered = false;
     let clock = drift;
     let slots: { x: number; w: number; char: string }[] = [];
@@ -324,14 +325,18 @@ function useCardCanvas({
         }
       }
       ctx.globalAlpha = 1;
-      // Only touch the label when its value moves, and drop the filter at
-      // rest; a live filter layer makes mobile Safari repaint in strips.
+      // The soft focus is a text-shadow rather than filter: blur(). WebKit
+      // paints a hairline along the top of a blur filter's outset region on
+      // iOS, which showed above the label while it faded.
       const el = label.current;
       const shown = Math.round(handoff * 100) / 100;
       if (el && shown !== labelShown) {
         labelShown = shown;
+        labelColor ||= getComputedStyle(el).color;
+        const soft = shown > 0 && shown < 1;
         el.style.opacity = String(shown);
-        el.style.filter = shown > 0 && shown < 1 ? `blur(${(1 - shown) * 4}px)` : "none";
+        el.style.color = soft ? "transparent" : "";
+        el.style.textShadow = soft ? `0 0 ${(1 - shown) * 8}px ${labelColor}` : "none";
       }
     };
 
