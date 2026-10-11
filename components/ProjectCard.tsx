@@ -91,6 +91,8 @@ function useCardCanvas({
     let roll = 0;
     let wasOver = false;
     let morph = 0;
+    let labelShown = 0;
+    let gathered = false;
     let clock = drift;
     let slots: { x: number; w: number; char: string }[] = [];
     let slotFont = "";
@@ -263,6 +265,10 @@ function useCardCanvas({
       if (reduced) morph = target;
       else if (target) morph = Math.min(1, morph + dt / 1400);
       else morph = Math.max(0, morph - dt / 800);
+      // Once everything has gathered into the label there is nothing left to
+      // draw, so stop repainting the canvas until the hover ends.
+      if (morph >= 1 && gathered) return;
+      gathered = morph >= 1;
       // The field eases to a stop while it gathers, so nothing pops mid-flight.
       if (!reduced) clock += (dt / 1000) * (1 - smooth(morph * 5));
       const t = clock;
@@ -318,10 +324,14 @@ function useCardCanvas({
         }
       }
       ctx.globalAlpha = 1;
+      // Only touch the label when its value moves, and drop the filter at
+      // rest; a live filter layer makes mobile Safari repaint in strips.
       const el = label.current;
-      if (el) {
-        el.style.opacity = String(handoff);
-        el.style.filter = `blur(${(1 - handoff) * 4}px)`;
+      const shown = Math.round(handoff * 100) / 100;
+      if (el && shown !== labelShown) {
+        labelShown = shown;
+        el.style.opacity = String(shown);
+        el.style.filter = shown > 0 && shown < 1 ? `blur(${(1 - shown) * 4}px)` : "none";
       }
     };
 
@@ -483,11 +493,10 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
           style={{ background: field ? "transparent" : PAPER }}
         />
         {field && (
-          <span
-            ref={labelRef}
-            className="pointer-events-none absolute inset-0 flex items-center justify-center text-[13px] tracking-[0.01em] text-muted opacity-0"
-          >
-            Coming soon
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <span ref={labelRef} className="text-[13px] tracking-[0.01em] text-muted opacity-0">
+              Coming soon
+            </span>
           </span>
         )}
         {/* Drawn above the art so light cards like Palisade still hold an edge. */}
