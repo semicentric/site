@@ -379,7 +379,7 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: reduced ? 0 : delay, ease: EASE }}
-        className="relative aspect-[4/5] w-full overflow-hidden bg-black/[0.025] outline outline-1 -outline-offset-1 outline-black/[0.06]"
+        className="relative aspect-[4/5] w-full overflow-hidden bg-black/[0.025]"
         style={{ contain: "paint" }}
       >
         {project.image && (
@@ -410,6 +410,11 @@ export default function ProjectCard({ project, delay }: { project: Project; dela
             Coming soon
           </span>
         )}
+        {/* Drawn above the art so light cards like Palisade still hold an edge. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.07)]"
+        />
       </motion.div>
       <motion.div
         initial={{ opacity: 0, filter: reduced ? "blur(0px)" : "blur(6px)" }}
