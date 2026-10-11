@@ -100,7 +100,7 @@ function useCardCanvas({
       width = bounds.width;
       height = bounds.height;
       if (!width || !height) return false;
-      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      const ratio = Math.min(window.devicePixelRatio || 1, 3);
       canvas.width = Math.ceil(width * ratio);
       canvas.height = Math.ceil(height * ratio);
       ctx.setTransform(canvas.width / width, 0, 0, canvas.height / height, 0, 0);
@@ -108,12 +108,12 @@ function useCardCanvas({
       rows = Math.max(1, Math.round((height / width) * columns * 0.6));
       cw = width / columns;
       ch = height / rows;
-      aw = Math.ceil(cw * ratio);
-      ah = Math.ceil(ch * ratio);
+      aw = Math.max(1, Math.round(cw * (canvas.width / width)));
+      ah = Math.max(1, Math.round(ch * (canvas.height / height)));
       atlas.width = aw * ATLAS.length;
       atlas.height = ah;
       atlasCtx.clearRect(0, 0, atlas.width, atlas.height);
-      atlasCtx.font = `${ch * 0.92 * ratio}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+      atlasCtx.font = `${ah * 0.92}px ui-monospace, SFMono-Regular, Menlo, monospace`;
       atlasCtx.textAlign = "center";
       atlasCtx.textBaseline = "middle";
       atlasCtx.fillStyle = INK;
@@ -154,7 +154,20 @@ function useCardCanvas({
     const glyph = (char: string, x: number, y: number, alpha: number) => {
       if (alpha <= 0.01) return;
       ctx.globalAlpha = Math.min(1, alpha);
-      ctx.drawImage(atlas, ATLAS.indexOf(char) * aw, 0, aw, ah, x, y, cw, ch);
+      // Land each glyph on whole device pixels so it stays sharp at 2x and 3x.
+      const sx = canvas.width / width;
+      const sy = canvas.height / height;
+      ctx.drawImage(
+        atlas,
+        ATLAS.indexOf(char) * aw,
+        0,
+        aw,
+        ah,
+        Math.round(x * sx) / sx,
+        Math.round(y * sy) / sy,
+        aw / sx,
+        ah / sy,
+      );
     };
 
     const paintMask = (backing: Float32Array) => {
@@ -166,7 +179,7 @@ function useCardCanvas({
         maskCtx.fillRect(i % columns, Math.floor(i / columns), 1, 1);
       }
       ctx.globalAlpha = 1;
-      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingEnabled = false;
       ctx.drawImage(mask, 0, 0, width, height);
     };
 
@@ -183,7 +196,7 @@ function useCardCanvas({
       ctx.clearRect(0, 0, width, height);
       for (let i = 0; i < cells.length; i++) {
         const order = clamp(sweepOrder(i % columns, columns, cells[i]));
-        backing[i] = 1 - smooth((r - order * 0.5) / 0.38);
+        backing[i] = 1 - smooth((r - order * 0.62) / 0.16);
       }
       paintMask(backing);
       for (let i = 0; i < cells.length; i++) {
@@ -194,14 +207,14 @@ function useCardCanvas({
         const age = clamp((coverage - raw) * 5);
         if (age <= 0) continue;
         const density = Math.min(1, cell.tone * 0.9 + cell.edge * 0.2);
-        const local = clamp((r - order * 0.5) / 0.45);
+        const local = clamp((r - order * 0.62 + 0.15) / 0.3);
         const char =
           age < 0.45
             ? streakGlyph(cell.seed >>> 4)
             : (p < 0.9 && age < 0.9) || (local > 0 && local < 0.8)
               ? flickerGlyph(density, cell.seed >>> 8, phase)
               : densityGlyph(density);
-        const settle = 1 - smooth((r - order * 0.5 - 0.1) / 0.32);
+        const settle = 1 - smooth((r - order * 0.62 - 0.02) / 0.16);
         const base = (0.08 + cell.prominence * 0.88) * smooth(age);
         const lift = base + (0.9 - base) * smooth(r / 0.35) * cell.prominence;
         glyph(char, col * cw, Math.floor(i / columns) * ch, lift * settle);
