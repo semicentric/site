@@ -1,7 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import Logo, { LOGO_RATIO } from "./Logo";
 
 export const EASE = [0.22, 1, 0.36, 1] as const;
@@ -131,30 +131,45 @@ export const linkClass =
 
 export function CopyEmail() {
   const [copied, setCopied] = useState(false);
+  const timer = useRef(0);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+  // Both labels stay mounted and cross-fade at once, centred on the email's
+  // footprint. Opacity and scale only: a blur filter draws a stray hairline
+  // on iOS Safari.
+  const swap = { duration: 0.28, ease: EASE };
   return (
     <button
-      onClick={() => {
-        navigator.clipboard.writeText(EMAIL);
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(EMAIL);
+        } catch {
+          return;
+        }
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        window.clearTimeout(timer.current);
+        timer.current = window.setTimeout(() => setCopied(false), 1600);
       }}
-      className={`relative cursor-pointer text-left ${linkClass}`}
+      aria-label={copied ? "email copied" : `copy ${EMAIL}`}
+      className={`relative cursor-pointer ${linkClass}`}
     >
-      <span className="invisible" aria-hidden>
+      <motion.span
+        aria-hidden
+        className="block whitespace-nowrap"
+        initial={false}
+        animate={{ opacity: copied ? 0 : 1, scale: copied ? 0.97 : 1 }}
+        transition={swap}
+      >
         {EMAIL}
-      </span>
-      <AnimatePresence initial={false} mode="wait">
-        <motion.span
-          key={String(copied)}
-          initial={{ opacity: 0, filter: "blur(4px)" }}
-          animate={{ opacity: 1, filter: "blur(0px)" }}
-          exit={{ opacity: 0, filter: "blur(4px)" }}
-          transition={{ duration: 0.22, ease: EASE }}
-          className="absolute inset-0 whitespace-nowrap"
-        >
-          {copied ? "copied" : EMAIL}
-        </motion.span>
-      </AnimatePresence>
+      </motion.span>
+      <motion.span
+        aria-hidden
+        className="absolute inset-0 flex items-center justify-center whitespace-nowrap"
+        initial={false}
+        animate={{ opacity: copied ? 1 : 0, scale: copied ? 1 : 1.03 }}
+        transition={swap}
+      >
+        copied
+      </motion.span>
     </button>
   );
 }
