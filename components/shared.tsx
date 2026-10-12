@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import Logo, { LOGO_RATIO } from "./Logo";
 
@@ -133,6 +133,10 @@ export function CopyEmail() {
   const [copied, setCopied] = useState(false);
   const timer = useRef(0);
   useEffect(() => () => window.clearTimeout(timer.current), []);
+  // Both labels stay mounted and cross-fade at once, centred on the email's
+  // footprint. Opacity and scale only: a blur filter draws a stray hairline
+  // on iOS Safari.
+  const swap = { duration: 0.28, ease: EASE };
   return (
     <button
       onClick={async () => {
@@ -148,24 +152,24 @@ export function CopyEmail() {
       aria-label={copied ? "email copied" : `copy ${EMAIL}`}
       className={`relative cursor-pointer ${linkClass}`}
     >
-      <span className="invisible block whitespace-nowrap" aria-hidden>
+      <motion.span
+        aria-hidden
+        className="block whitespace-nowrap"
+        initial={false}
+        animate={{ opacity: copied ? 0 : 1, scale: copied ? 0.97 : 1 }}
+        transition={swap}
+      >
         {EMAIL}
-      </span>
-      {/* Same out-then-in blur swap as the rest of the site, with "copied"
-          centred on the email's footprint. */}
-      <AnimatePresence initial={false} mode="wait">
-        <motion.span
-          key={String(copied)}
-          aria-hidden
-          initial={{ opacity: 0, filter: "blur(4px)" }}
-          animate={{ opacity: 1, filter: "blur(0px)" }}
-          exit={{ opacity: 0, filter: "blur(4px)" }}
-          transition={{ duration: 0.18, ease: EASE }}
-          className="absolute inset-0 flex items-center justify-center whitespace-nowrap"
-        >
-          {copied ? "copied" : EMAIL}
-        </motion.span>
-      </AnimatePresence>
+      </motion.span>
+      <motion.span
+        aria-hidden
+        className="absolute inset-0 flex items-center justify-center whitespace-nowrap"
+        initial={false}
+        animate={{ opacity: copied ? 1 : 0, scale: copied ? 1 : 1.03 }}
+        transition={swap}
+      >
+        copied
+      </motion.span>
     </button>
   );
 }
