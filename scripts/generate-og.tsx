@@ -29,7 +29,7 @@ const [display, mono] = await Promise.all([
 // crisp; no background noise or translucent fringe characters.
 const columns = 60;
 const rows = 25;
-const cell = 526 / columns;
+const cell = 450 / columns;
 const mark = readFileSync("public/logo.svg", "utf8")
   .replace(/viewBox="[^"]+"/, 'viewBox="31 164 450 187.5"')
   .replace("<svg ", `<svg width="${columns}" height="${rows}" `);
@@ -41,20 +41,19 @@ for (let y = 0; y < rows; y++) {
     const alpha = pixels[(y * columns + x) * 4 + 3] / 255;
     if (alpha < 0.45) continue;
     glyphs.push(
-      <span key={`${x}-${y}`} style={{ position: "absolute", left: x * cell, top: y * cell, fontSize: 10, lineHeight: 1 }}>#</span>,
+      <span key={`${x}-${y}`} style={{ position: "absolute", left: x * cell, top: y * cell, fontSize: 9, lineHeight: 1 }}>#</span>,
     );
   }
 }
 
 const svg = await satori(
   <div style={{ width: "100%", height: "100%", display: "flex", background: paper, color: ink, fontFamily: "Instrument Sans", overflow: "hidden" }}>
-    <div style={{ position: "absolute", left: 64, top: 53, fontSize: 78, letterSpacing: "-0.045em" }}>semicentric</div>
-    <div style={{ position: "absolute", left: 64, top: 260, display: "flex", flexDirection: "column", fontSize: 62, letterSpacing: "-0.045em", lineHeight: 1.04 }}>
-      <span>The machine</span>
-      <span>should answer</span>
-      <span>to you.</span>
+    <div style={{ position: "absolute", left: 64, top: 49, width: 1072, display: "flex", justifyContent: "center", fontSize: 56, letterSpacing: "-0.045em" }}>semicentric</div>
+    <div style={{ position: "absolute", left: 395, top: 161, width: 450, height: 188, display: "flex", fontFamily: "IBM Plex Mono", fontWeight: 700 }}>{glyphs}</div>
+    <div style={{ position: "absolute", left: 64, top: 399, width: 1072, display: "flex", flexDirection: "column", alignItems: "center", fontSize: 66, letterSpacing: "-0.045em", lineHeight: 1.04 }}>
+      <span>The machine should</span>
+      <span>answer to you.</span>
     </div>
-    <div style={{ position: "absolute", left: 610, top: 250, width: 526, height: 220, display: "flex", fontFamily: "IBM Plex Mono", fontWeight: 700 }}>{glyphs}</div>
   </div>,
   { width: 1200, height: 630, fonts: [
     { name: "Instrument Sans", data: display, weight: 600, style: "normal" },
