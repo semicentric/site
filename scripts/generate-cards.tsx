@@ -364,6 +364,12 @@ const SRAM = {
   mark: readFileSync(join(root, "scripts/assets/sram-mark.svg"), "utf8").match(/d="([^"]+)"/)![1],
 };
 
+// Rasterize the soft mask directly: Satori's multi-stop alpha gradients can
+// introduce a visible band at the top edge of the image.
+const featherStops = [[0, 0], [0.05, 0.04], [0.10, 0.16], [0.16, 0.38], [0.23, 0.68], [0.30, 0.9], [0.38, 1], [0.70, 1], [0.76, 0.9], [0.83, 0.65], [0.90, 0.3], [1, 0]];
+const feathered = new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 1800 1200"><defs><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">${featherStops.map(([offset, opacity]) => `<stop offset="${offset}" stop-color="white" stop-opacity="${opacity}"/>`).join("")}</linearGradient><mask id="soft"><rect width="1800" height="1200" fill="url(#fade)"/></mask></defs><image href="${SRAM.hero}" width="1800" height="1200" mask="url(#soft)"/></svg>`).render().asPng();
+const sramPhoto = `data:image/png;base64,${feathered.toString("base64")}`;
+
 for (const mobile of [false, true]) {
   await render(
     mobile ? "sram-mobile" : "sram",
@@ -374,12 +380,11 @@ for (const mobile of [false, true]) {
         <span>machines.</span>
       </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={SRAM.hero} alt="" width={640} height={427} style={{ position: "absolute", left: 80, top: mobile ? 420 : 380 }} />
+      <img src={sramPhoto} alt="" width={900} height={600} style={{ position: "absolute", left: -24, top: mobile ? 390 : 350 }} />
       <div style={{ display: "flex", alignItems: "center", position: "absolute", left: 80, bottom: 72, gap: 20 }}>
         <svg width={mobile ? 116 : 86} height={mobile ? 43 : 32} viewBox="0 0 915 340">
           <path fill={SRAM.ink} d={SRAM.mark} />
         </svg>
-        <span style={{ fontSize: mobile ? 48 : 36, letterSpacing: "-0.01em" }}>SRAM</span>
       </div>
     </div>,
   );
