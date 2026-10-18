@@ -374,7 +374,7 @@ for (const mobile of [false, true]) {
         <span>machines.</span>
       </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={SRAM.hero} alt="" width={900} height={600} style={{ position: "absolute", left: -24, top: mobile ? 370 : 330, maskImage: "linear-gradient(to bottom, transparent, black 18%, black 74%, transparent)" }} />
+      <img src={SRAM.hero} alt="" width={640} height={427} style={{ position: "absolute", left: 80, top: mobile ? 420 : 380 }} />
       <div style={{ display: "flex", alignItems: "center", position: "absolute", left: 80, bottom: 72, gap: 20 }}>
         <svg width={mobile ? 116 : 86} height={mobile ? 43 : 32} viewBox="0 0 915 340">
           <path fill={SRAM.ink} d={SRAM.mark} />
