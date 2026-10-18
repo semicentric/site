@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "cards": "bun run scripts/generate-cards.tsx"
+    "cards": "bun run scripts/generate-cards.tsx",
+    "og": "bun run scripts/generate-og.tsx"
   },
   "dependencies": {
     "framer-motion": "^12.38.0",

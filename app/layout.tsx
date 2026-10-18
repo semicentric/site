@@ -29,11 +29,23 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://semicentric.co"),
   title: "semicentric",
   description:
     "semicentric is a security company. the machine in front of you should answer to you.",
   openGraph: {
-    images: ["/og-image.png"],
+    type: "website",
+    url: "https://semicentric.co",
+    siteName: "semicentric",
+    images: [{
+      url: "/og-image.png",
+      width: 1200,
+      height: 630,
+      alt: "semicentric — The machine should answer to you. An ASCII rendering of the semicentric emblem.",
+    }],
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 };
 
