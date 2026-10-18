@@ -16,8 +16,13 @@ const PROJECTS: Project[] = [
     image: "/projects/palisade.png",
     mobileImage: "/projects/palisade-mobile.png",
   },
+  {
+    name: "SRAM",
+    href: "https://sram.build",
+    image: "/projects/sram.png",
+    mobileImage: "/projects/sram-mobile.png",
+  },
   { name: "Evanescent" },
-  { name: "SRAM" },
 ];
 
 export default function Projects() {

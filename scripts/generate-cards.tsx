@@ -20,13 +20,15 @@ async function loadGoogleFont(family: string, weight: number) {
   return fetch(url).then((r) => r.arrayBuffer());
 }
 
-const [archivoBold, fragmentMono] = await Promise.all([
+const [archivoBold, fragmentMono, hanken] = await Promise.all([
   loadGoogleFont("Archivo", 700),
   loadGoogleFont("Fragment Mono", 400),
+  loadGoogleFont("Hanken Grotesk", 500),
 ]);
 const overused = readFileSync(join(root, "scripts/fonts/overused-grotesk-500.ttf"));
 
 const fonts = [
+  { name: "Hanken Grotesk", data: hanken, weight: 500 as const, style: "normal" as const },
   { name: "Archivo", data: archivoBold, weight: 700 as const, style: "normal" as const },
   { name: "Fragment Mono", data: fragmentMono, weight: 400 as const, style: "normal" as const },
   { name: "Overused Grotesk", data: overused, weight: 500 as const, style: "normal" as const },
@@ -352,3 +354,33 @@ await render(
     </div>
   </div>,
 );
+
+// SRAM's current product render and mark, retained locally so cards can be
+// regenerated without a sibling checkout. Source: semicentric/SRAM/web/public.
+const SRAM = {
+  paper: "#f1f1ed",
+  ink: "#111210",
+  hero: `data:image/jpeg;base64,${readFileSync(join(root, "scripts/assets/sram-hero.jpg")).toString("base64")}`,
+  mark: readFileSync(join(root, "scripts/assets/sram-mark.svg"), "utf8").match(/d="([^"]+)"/)![1],
+};
+
+for (const mobile of [false, true]) {
+  await render(
+    mobile ? "sram-mobile" : "sram",
+    <div style={{ display: "flex", position: "relative", width: "100%", height: "100%", backgroundColor: SRAM.paper, color: SRAM.ink, fontFamily: "Hanken Grotesk", fontWeight: 500, overflow: "hidden" }}>
+      <div style={{ display: "flex", flexDirection: "column", position: "absolute", left: 80, top: 88, fontSize: mobile ? 96 : 78, letterSpacing: "-0.025em", lineHeight: 1.04 }}>
+        <span>Machines</span>
+        <span>that make</span>
+        <span>machines.</span>
+      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={SRAM.hero} alt="" width={900} height={600} style={{ position: "absolute", left: -24, top: mobile ? 370 : 330, maskImage: "linear-gradient(to bottom, transparent, black 18%, black 74%, transparent)" }} />
+      <div style={{ display: "flex", alignItems: "center", position: "absolute", left: 80, bottom: 72, gap: 20 }}>
+        <svg width={mobile ? 116 : 86} height={mobile ? 43 : 32} viewBox="0 0 915 340">
+          <path fill={SRAM.ink} d={SRAM.mark} />
+        </svg>
+        <span style={{ fontSize: mobile ? 48 : 36, letterSpacing: "-0.01em" }}>SRAM</span>
+      </div>
+    </div>,
+  );
+}
